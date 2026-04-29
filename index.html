@@ -1,0 +1,1751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pai's Trading Workbook</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=JetBrains+Mono:wght@300;400;500;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0d13;--surface:#0f1520;--card:#131c2a;--card2:#162030;--border:#1e2d40;--border2:#243650;--gold:#c9a84c;--gold2:#e8c96d;--gold-bg:rgba(201,168,76,0.08);--green:#2ecc8a;--green-bg:rgba(46,204,138,0.08);--red:#e05555;--red-bg:rgba(224,85,85,0.08);--blue:#4a9eff;--blue-bg:rgba(74,158,255,0.08);--text:#dce8f5;--muted:#5a7a99;--muted2:#3d5570;}
+/* LIGHT THEME */
+body.theme-light{--bg:#f5f4f0;--surface:#ffffff;--card:#ffffff;--card2:#f0ede8;--border:#ddd9d0;--border2:#ccc8c0;--gold:#b8860b;--gold2:#9a6e00;--gold-bg:rgba(184,134,11,0.08);--green:#1a7a4a;--green-bg:rgba(26,122,74,0.08);--red:#c0392b;--red-bg:rgba(192,57,43,0.08);--blue:#1a5276;--blue-bg:rgba(26,82,118,0.08);--text:#1a1a1a;--muted:#777;--muted2:#aaa;}
+/* FOREST THEME */
+body.theme-forest{--bg:#0d1a0f;--surface:#111f13;--card:#162419;--card2:#1a2c1e;--border:#1e3522;--border2:#264430;--gold:#a8c84c;--gold2:#c4e86d;--gold-bg:rgba(168,200,76,0.08);--green:#4ecc6a;--green-bg:rgba(78,204,106,0.08);--red:#e05555;--red-bg:rgba(224,85,85,0.08);--blue:#4acca8;--blue-bg:rgba(74,204,168,0.08);--text:#d5f0da;--muted:#5a9960;--muted2:#3d6642;}
+/* MIDNIGHT BLUE THEME */
+body.theme-midnight{--bg:#050a18;--surface:#080f24;--card:#0d1630;--card2:#101c38;--border:#162040;--border2:#1e2e58;--gold:#e8b84c;--gold2:#ffd56d;--gold-bg:rgba(232,184,76,0.08);--green:#4acca8;--green-bg:rgba(74,204,168,0.08);--red:#e05577;--red-bg:rgba(224,85,119,0.08);--blue:#7ab4ff;--blue-bg:rgba(122,180,255,0.08);--text:#d0e4ff;--muted:#5070a0;--muted2:#384e78;}
+/* ROSE GOLD THEME */
+body.theme-rose{--bg:#1a1015;--surface:#201318;--card:#281820;--card2:#301c26;--border:#3d2030;--border2:#4a2838;--gold:#e8a06d;--gold2:#ffc090;--gold-bg:rgba(232,160,109,0.08);--green:#cc8aaa;--green-bg:rgba(204,138,170,0.08);--red:#e05555;--red-bg:rgba(224,85,85,0.08);--blue:#c088e8;--blue-bg:rgba(192,136,232,0.08);--text:#f5d8e8;--muted:#8a5870;--muted2:#5a3850;}
+
+/* THEME SWITCHER UI */
+.theme-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:32px;}
+.theme-swatch{background:var(--card);border:2px solid var(--border);border-radius:10px;padding:14px 10px;text-align:center;cursor:pointer;transition:all 0.2s;}
+.theme-swatch:hover{border-color:var(--gold);transform:translateY(-2px);}
+.theme-swatch.active{border-color:var(--gold2);box-shadow:0 0 12px var(--gold-bg);}
+.theme-swatch .sw-preview{display:flex;gap:3px;justify-content:center;margin-bottom:8px;}
+.theme-swatch .sw-dot{width:10px;height:10px;border-radius:50%;}
+.theme-swatch .sw-name{font-family:JetBrains Mono,monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);}
+.dark-light-row{display:flex;align-items:center;gap:14px;margin-bottom:32px;padding:16px 20px;background:var(--card);border:1px solid var(--border);border-radius:10px;}
+.dl-label{font-family:JetBrains Mono,monospace;font-size:11px;color:var(--text);letter-spacing:0.1em;}
+.toggle-switch{position:relative;width:52px;height:26px;flex-shrink:0;}
+.toggle-switch input{opacity:0;width:0;height:0;}
+.toggle-slider{position:absolute;cursor:pointer;inset:0;background:var(--border2);border-radius:26px;transition:0.3s;}
+.toggle-slider:before{content:'';position:absolute;width:20px;height:20px;left:3px;top:3px;background:#fff;border-radius:50%;transition:0.3s;}
+.toggle-switch input:checked + .toggle-slider{background:var(--gold);}
+.toggle-switch input:checked + .toggle-slider:before{transform:translateX(26px);}
+
+/* JOURNAL */
+.journal-list{display:flex;flex-direction:column;gap:10px;}
+.journal-card{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;transition:border-color 0.15s;}
+.journal-card:hover{border-color:var(--border2);}
+.journal-card-hdr{background:var(--card2);padding:10px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer;}
+.journal-date{font-family:JetBrains Mono,monospace;font-size:11px;color:var(--gold2);letter-spacing:0.08em;}
+.journal-day-name{font-family:JetBrains Mono,monospace;font-size:10px;color:var(--muted);}
+.journal-pnl{font-family:Cormorant Garamond,serif;font-size:18px;font-weight:700;}
+.journal-pnl.pos{color:var(--green);}
+.journal-pnl.neg{color:var(--red);}
+.journal-expand{font-size:11px;color:var(--muted);transition:transform 0.2s;}
+.journal-card.open .journal-expand{transform:rotate(180deg);}
+.journal-body{display:none;padding:16px 18px;}
+.journal-card.open .journal-body{display:block;}
+.journal-section{margin-bottom:12px;}
+.journal-section-label{font-family:JetBrains Mono,monospace;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:5px;}
+.journal-text{font-size:13px;color:var(--text);line-height:1.65;white-space:pre-wrap;}
+.journal-tag-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;}
+.journal-tag{font-family:JetBrains Mono,monospace;font-size:9px;padding:3px 8px;border-radius:4px;background:var(--card2);border:1px solid var(--border);color:var(--muted);}
+.journal-empty{color:var(--muted);font-family:JetBrains Mono,monospace;font-size:12px;padding:24px;text-align:center;}
+.journal-search{width:100%;background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:DM Sans,sans-serif;font-size:13px;padding:10px 14px;outline:none;margin-bottom:16px;}
+.journal-search:focus{border-color:var(--gold);}
+
+/* ANALYTICS */
+.analytics-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;}
+.an-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;text-align:center;}
+.an-label{font-family:JetBrains Mono,monospace;font-size:8px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
+.an-val{font-family:Cormorant Garamond,serif;font-size:32px;font-weight:700;line-height:1;margin-bottom:3px;}
+.an-sub{font-family:JetBrains Mono,monospace;font-size:9px;color:var(--muted);}
+.streak-bar{display:flex;gap:3px;flex-wrap:wrap;margin-bottom:24px;}
+.streak-dot{width:20px;height:20px;border-radius:4px;flex-shrink:0;cursor:default;position:relative;}
+.streak-dot.g{background:var(--green);}
+.streak-dot.r{background:var(--red);}
+.streak-dot.n{background:var(--border2);}
+.streak-dot:hover::after{content:attr(data-tip);position:absolute;bottom:26px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--border2);border-radius:4px;padding:3px 7px;font-family:JetBrains Mono,monospace;font-size:9px;color:var(--text);white-space:nowrap;z-index:10;}
+.dist-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.dist-label{font-family:JetBrains Mono,monospace;font-size:10px;color:var(--muted);width:80px;flex-shrink:0;}
+.dist-bar-bg{flex:1;height:8px;background:var(--border);border-radius:4px;overflow:hidden;}
+.dist-bar-fill{height:100%;border-radius:4px;transition:width 0.5s ease;}
+.dist-val{font-family:JetBrains Mono,monospace;font-size:10px;color:var(--muted);width:40px;text-align:right;flex-shrink:0;}
+.an-table{width:100%;border-collapse:collapse;}
+.an-table th{font-family:JetBrains Mono,monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);padding:8px 12px;text-align:left;border-bottom:1px solid var(--border);background:var(--card2);}
+.an-table td{padding:9px 12px;border-bottom:1px solid var(--border);font-size:12px;}
+.an-table tbody tr:hover{background:var(--card2);}
+.an-table tbody tr:last-child td{border-bottom:none;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:DM Sans,sans-serif;line-height:1.6;}
+::-webkit-scrollbar{width:4px;}
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0;}
+input[type=number]{-moz-appearance:textfield;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+.app{display:flex;min-height:100vh;}
+.sidebar{width:220px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);padding:28px 0;position:fixed;top:0;left:0;bottom:0;overflow-y:auto;z-index:100;}
+.sidebar-logo{padding:0 20px 24px;border-bottom:1px solid var(--border);margin-bottom:20px;}
+.logo-text{font-family:Cormorant Garamond,serif;font-size:20px;font-weight:700;color:var(--gold2);line-height:1.1;}
+.logo-sub{font-family:JetBrains Mono,monospace;font-size:9px;color:var(--muted);letter-spacing:0.15em;text-transform:uppercase;margin-top:4px;}
+.nav-section{padding:0 12px;margin-bottom:8px;}
+.nav-section-label{font-family:JetBrains Mono,monospace;font-size:8px;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted2);padding:0 8px;margin-bottom:6px;}
+.nav-btn{display:flex;align-items:center;gap:8px;width:100%;padding:9px 10px;border-radius:6px;border:none;background:transparent;color:var(--muted);font-family:DM Sans,sans-serif;font-size:13px;cursor:pointer;text-align:left;transition:all 0.15s;margin-bottom:2px;}
+.nav-btn:hover{background:var(--card);color:var(--text);}
+.nav-btn.active{background:var(--gold-bg);color:var(--gold2);border:1px solid rgba(201,168,76,0.2);}
+.nav-icon{font-size:14px;width:18px;text-align:center;}
+.main{margin-left:220px;flex:1;padding:0;}
+.page{display:none;padding:40px 36px 80px;}
+.page.active{display:block;}
+.page-hdr{margin-bottom:36px;padding-bottom:24px;border-bottom:1px solid var(--border);display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+.page-hdr h1{font-family:Cormorant Garamond,serif;font-size:clamp(32px,5vw,52px);font-weight:700;color:#fff;line-height:1;letter-spacing:-0.01em;}
+.page-hdr h1 span{color:var(--gold2);}
+.hdr-meta{font-family:JetBrains Mono,monospace;font-size:10px;color:var(--muted);letter-spacing:0.12em;text-align:right;}
+.sl{font-family:JetBrains Mono,monospace;font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--muted);margin-bottom:14px;display:flex;align-items:center;gap:10px;}
+.sl::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* ROADMAP */
+.roadmap-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:40px;}
+.rm-card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:border-color 0.2s,transform 0.2s;cursor:pointer;}
+.rm-card:hover{border-color:var(--gold);transform:translateY(-2px);}
+.rm-card.current{border-color:var(--gold);}
+.rm-card-hdr{padding:14px 18px 12px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+.rm-month{font-family:Cormorant Garamond,serif;font-size:22px;font-weight:700;color:#fff;}
+.rm-badge{font-family:JetBrains Mono,monospace;font-size:9px;padding:3px 8px;border-radius:4px;letter-spacing:0.1em;text-transform:uppercase;}
+.badge-active{background:var(--gold-bg);color:var(--gold2);border:1px solid rgba(201,168,76,0.25);}
+.badge-scale{background:var(--green-bg);color:var(--green);border:1px solid rgba(46,204,138,0.25);}
+.badge-consol{background:var(--blue-bg);color:var(--blue);border:1px solid rgba(74,158,255,0.25);}
+.rm-card-body{padding:14px 18px;}
+.rm-stat-row{display:flex;justify-content:space-between;margin-bottom:8px;font-size:12px;}
+.rm-stat-row .rsl{color:var(--muted);font-family:JetBrains Mono,monospace;font-size:10px;}
+.rm-stat-row .rsv{font-weight:500;color:var(--text);}
+.rm-stat-row .rsv.green{color:var(--green);}
+.rm-stat-row .rsv.gold{color:var(--gold2);}
+.rm-stat-row .rsv.red{color:var(--red);}
+.rm-goal{margin-top:12px;padding-top:10px;border-top:1px solid var(--border);font-size:12px;color:var(--muted);font-style:italic;line-height:1.5;}
+
+/* DAILY WORKBOOK */
+.pnl-summary{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px 20px;display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px;}
+.pi-label{font-family:JetBrains Mono,monospace;font-size:8px;letter-spacing:0.16em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
+.pi-val{font-family:Cormorant Garamond,serif;font-size:26px;font-weight:700;line-height:1;}
+.pi-sub{font-family:JetBrains Mono,monospace;font-size:9px;color:var(--muted);margin-top:3px;}
+
+.wb-card{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:16px;}
+.wb-card-hdr{background:var(--card2);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;}
+.wh-title{font-family:JetBrains Mono,monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);}
+.wb-card-body{padding:14px 16px;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+
+/* CHECKLIST */
+.checklist{list-style:none;}
+.check-item{display:flex;align-items:flex-start;gap:10px;padding:7px 0;border-bottom:1px solid var(--border);cursor:pointer;user-select:none;}
+.check-item:last-child{border-bottom:none;}
+.check-box{width:16px;height:16px;border:1.5px solid var(--border2);border-radius:3px;flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;transition:all 0.15s;}
+.check-item.checked .check-box{background:var(--green);border-color:var(--green);}
+.check-item.checked .check-box::after{content:'✓';color:#fff;font-size:10px;font-weight:700;}
+.check-item.checked .check-label{text-decoration:line-through;color:var(--muted);}
+.check-label{font-size:12px;color:var(--text);line-height:1.4;}
+.check-sub{display:block;font-size:10px;color:var(--muted);font-family:JetBrains Mono,monospace;margin-top:1px;}
+
+/* TRADE LOG */
+.trade-log-table{width:100%;border-collapse:collapse;}
+.trade-log-table thead tr{background:var(--card2);}
+.trade-log-table th{font-family:JetBrains Mono,monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);padding:8px 10px;text-align:left;border-bottom:1px solid var(--border);}
+.trade-log-table td{padding:6px 6px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.trade-log-table tbody tr:hover{background:rgba(255,255,255,0.02);}
+.trade-log-table tbody tr:last-child td{border-bottom:none;}
+.tl-input{background:var(--bg);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:JetBrains Mono,monospace;font-size:11px;padding:5px 7px;width:100%;outline:none;transition:border-color 0.15s;}
+.tl-input:focus{border-color:var(--gold);}
+.tl-input.pos{color:var(--green);}
+.tl-input.neg{color:var(--red);}
+.tl-select{background:var(--bg);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:JetBrains Mono,monospace;font-size:11px;padding:5px 7px;width:100%;outline:none;cursor:pointer;}
+.tl-select option{background:var(--card);}
+.del-btn{background:transparent;border:none;color:var(--muted2);cursor:pointer;font-size:14px;padding:2px 6px;border-radius:3px;transition:color 0.15s;}
+.del-btn:hover{color:var(--red);}
+.add-trade-btn{width:100%;padding:8px;margin-top:10px;background:transparent;border:1px dashed var(--border2);border-radius:6px;color:var(--muted);font-family:JetBrains Mono,monospace;font-size:11px;cursor:pointer;transition:all 0.15s;letter-spacing:0.08em;}
+.add-trade-btn:hover{border-color:var(--gold);color:var(--gold2);}
+
+/* EMOTION */
+.emotion-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;}
+.emo-btn{padding:5px 10px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:11px;cursor:pointer;transition:all 0.15s;}
+.emo-btn:hover{border-color:var(--gold);color:var(--gold2);}
+.emo-btn.selected{background:var(--gold-bg);border-color:var(--gold);color:var(--gold2);}
+
+/* NOTES */
+.notes-area{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:DM Sans,sans-serif;font-size:13px;padding:12px;resize:vertical;min-height:72px;outline:none;line-height:1.6;}
+.notes-area:focus{border-color:var(--gold);}
+.notes-area::placeholder{color:var(--muted2);}
+.form-label{font-family:JetBrains Mono,monospace;font-size:9px;color:var(--muted);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:6px;display:block;}
+.num-input{background:var(--bg);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:JetBrains Mono,monospace;font-size:14px;padding:6px 10px;width:80px;outline:none;}
+.num-input:focus{border-color:var(--gold);}
+
+/* SETUP TRACKER */
+.setup-add-row{display:flex;gap:8px;margin-bottom:16px;align-items:center;}
+.setup-add-row input{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:JetBrains Mono,monospace;font-size:12px;padding:8px 12px;outline:none;}
+.setup-add-row input:focus{border-color:var(--gold);}
+.setup-add-btn{background:var(--gold-bg);border:1px solid var(--gold);border-radius:6px;color:var(--gold2);font-family:JetBrains Mono,monospace;font-size:11px;padding:8px 16px;cursor:pointer;white-space:nowrap;letter-spacing:0.08em;}
+.setup-add-btn:hover{background:rgba(201,168,76,0.15);}
+.setup-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-bottom:24px;}
+.setup-card{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;transition:border-color 0.15s;}
+.setup-card:hover{border-color:var(--border2);}
+.setup-card-hdr{background:var(--card2);padding:10px 14px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+.setup-name{font-family:Cormorant Garamond,serif;font-size:16px;font-weight:700;color:#fff;}
+.setup-del{background:transparent;border:none;color:var(--muted2);cursor:pointer;font-size:13px;}
+.setup-del:hover{color:var(--red);}
+.setup-card-body{padding:12px 14px;}
+.setup-stat{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-size:12px;}
+.setup-stat .ssl{color:var(--muted);font-family:JetBrains Mono,monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;}
+.setup-stat .ssv{font-family:JetBrains Mono,monospace;font-size:12px;font-weight:600;}
+.wr-bar-bg{height:5px;background:var(--border);border-radius:3px;margin-top:8px;overflow:hidden;}
+.wr-bar-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--red),var(--green));transition:width 0.4s ease;}
+.setup-log{margin-top:10px;border-top:1px solid var(--border);padding-top:8px;max-height:120px;overflow-y:auto;}
+.setup-log-row{display:flex;justify-content:space-between;font-family:JetBrains Mono,monospace;font-size:10px;padding:3px 0;border-bottom:1px solid var(--border);color:var(--muted);}
+.setup-log-row:last-child{border-bottom:none;}
+.setup-log-row .slr-pnl.pos{color:var(--green);}
+.setup-log-row .slr-pnl.neg{color:var(--red);}
+
+/* CALENDAR PAGE */
+.cal-nav{display:flex;align-items:center;gap:12px;margin-bottom:20px;}
+.cal-nav-btn{background:var(--card);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:JetBrains Mono,monospace;font-size:13px;padding:8px 14px;cursor:pointer;transition:all 0.15s;}
+.cal-nav-btn:hover{border-color:var(--gold);color:var(--gold2);}
+.cal-month-title{font-family:Cormorant Garamond,serif;font-size:26px;font-weight:700;color:#fff;flex:1;text-align:center;}
+.cal-grid-wrap{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:24px;}
+.cal-dow-hdr{display:grid;grid-template-columns:repeat(7,1fr);background:var(--card2);border-bottom:1px solid var(--border);}
+.cal-dow-cell{text-align:center;padding:10px 4px;font-family:JetBrains Mono,monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);}
+.cal-body{display:grid;grid-template-columns:repeat(7,1fr);}
+.cal-cell{min-height:80px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);padding:8px;position:relative;cursor:pointer;transition:background 0.15s;}
+.cal-cell:hover{background:var(--card2);}
+.cal-cell:nth-child(7n){border-right:none;}
+.cal-cell.empty{background:var(--bg);cursor:default;}
+.cal-cell.empty:hover{background:var(--bg);}
+.cal-cell.weekend{background:rgba(255,255,255,0.01);}
+.cal-cell.today{outline:2px solid var(--gold);outline-offset:-2px;}
+.cal-cell.has-data.pos{background:rgba(46,204,138,0.06);}
+.cal-cell.has-data.neg{background:rgba(224,85,85,0.06);}
+.cal-day-num{font-family:JetBrains Mono,monospace;font-size:11px;color:var(--muted);margin-bottom:4px;}
+.cal-cell.today .cal-day-num{color:var(--gold2);font-weight:700;}
+.cal-cell.weekend .cal-day-num{color:var(--muted2);}
+.cal-pnl-val{font-family:Cormorant Garamond,serif;font-size:18px;font-weight:700;line-height:1;}
+.cal-pnl-val.pos{color:var(--green);}
+.cal-pnl-val.neg{color:var(--red);}
+.cal-pnl-sub{font-family:JetBrains Mono,monospace;font-size:9px;color:var(--muted);margin-top:2px;}
+.cal-month-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.cms-item{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:14px 16px;}
+.cms-label{font-family:JetBrains Mono,monospace;font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
+.cms-val{font-family:Cormorant Garamond,serif;font-size:28px;font-weight:700;line-height:1;}
+
+/* WEEKLY */
+.week-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:24px;}
+.week-day-card{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;cursor:pointer;transition:border-color 0.15s;}
+.week-day-card:hover{border-color:var(--gold);}
+.wdc-hdr{background:var(--card2);padding:10px 14px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+.wdc-day{font-family:Cormorant Garamond,serif;font-size:16px;font-weight:700;color:#fff;}
+.wdc-dot{width:8px;height:8px;border-radius:50%;background:var(--muted2);}
+.wdc-dot.g{background:var(--green);}
+.wdc-dot.r{background:var(--red);}
+.wdc-body{padding:12px 14px;}
+.wdc-stat{display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px;}
+.wdl{color:var(--muted);font-family:JetBrains Mono,monospace;font-size:9px;}
+.wdv{font-family:JetBrains Mono,monospace;font-size:11px;}
+.wdc-pnl{font-family:Cormorant Garamond,serif;font-size:22px;font-weight:700;margin-top:8px;}
+
+/* PROGRESS */
+.progress-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px;}
+.prog-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px;text-align:center;}
+.pc-label{font-family:JetBrains Mono,monospace;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;}
+.pc-val{font-family:Cormorant Garamond,serif;font-size:36px;font-weight:700;line-height:1;margin-bottom:4px;}
+.pc-sub{font-family:JetBrains Mono,monospace;font-size:10px;color:var(--muted);}
+
+/* RULES */
+.rule-block{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:12px;}
+.rule-block-hdr{background:var(--card2);padding:12px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+.rb-title{font-family:Cormorant Garamond,serif;font-size:17px;font-weight:700;color:#fff;}
+.rule-block-body{padding:14px 18px;}
+.rule-line{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;color:var(--text);line-height:1.5;}
+.rule-line:last-child{border-bottom:none;}
+.rule-line::before{content:'→';color:var(--gold2);font-family:JetBrains Mono,monospace;flex-shrink:0;margin-top:1px;}
+.rule-line strong{color:var(--gold2);}
+.rule-red{color:var(--red);font-weight:600;}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:200;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--surface);border:1px solid var(--border2);border-radius:14px;width:90%;max-width:580px;max-height:80vh;overflow-y:auto;padding:28px;}
+.modal-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border);}
+.modal-title{font-family:Cormorant Garamond,serif;font-size:26px;font-weight:700;color:var(--gold2);}
+.modal-close{background:transparent;border:1px solid var(--border);color:var(--muted);width:28px;height:28px;border-radius:6px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;}
+.modal-close:hover{border-color:var(--red);color:var(--red);}
+.modal-stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px;}
+.ms-item{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center;}
+.msi-label{font-family:JetBrains Mono,monospace;font-size:8px;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
+.msi-val{font-family:Cormorant Garamond,serif;font-size:22px;font-weight:700;}
+.mgl-item{display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--card);border:1px solid var(--border);border-radius:6px;font-size:13px;color:var(--text);margin-bottom:6px;}
+.mgl-item::before{content:'✦';color:var(--gold2);font-size:10px;flex-shrink:0;}
+
+/* SAVE */
+.save-indicator{position:fixed;bottom:20px;right:20px;background:var(--green-bg);border:1px solid var(--green);border-radius:6px;padding:8px 14px;font-family:JetBrains Mono,monospace;font-size:11px;color:var(--green);opacity:0;transform:translateY(10px);transition:all 0.3s;z-index:300;}
+.save-indicator.show{opacity:1;transform:translateY(0);}
+.save-btn{background:var(--gold-bg);border:1px solid var(--gold);border-radius:6px;color:var(--gold2);font-family:JetBrains Mono,monospace;font-size:11px;padding:8px 16px;cursor:pointer;letter-spacing:0.08em;}
+.save-btn:hover{background:rgba(201,168,76,0.15);}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-text">Trader's<br>Workbook</div>
+    <div class="logo-sub">NQ / MNQ · Topstep</div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-label">Overview</div>
+    <button class="nav-btn active" onclick="showPage('roadmap',this)"><span class="nav-icon">🗺</span> 6-Month Roadmap</button>
+    <button class="nav-btn" onclick="showPage('rules',this)"><span class="nav-icon">📋</span> Trading Rules</button>
+    <button class="nav-btn" onclick="showPage('setups',this)"><span class="nav-icon">🎯</span> Setup Tracker</button>
+    <button class="nav-btn" onclick="showPage('progress',this)"><span class="nav-icon">📈</span> Progress</button>
+    <button class="nav-btn" onclick="showPage('analytics',this)"><span class="nav-icon">📊</span> Analytics</button>
+    <button class="nav-btn" onclick="showPage('journal',this)"><span class="nav-icon">📖</span> Journal List</button>
+    <button class="nav-btn" onclick="showPage('themes',this)"><span class="nav-icon">🎨</span> Themes</button>
+  </div>
+  <div class="nav-section" style="margin-top:8px">
+    <div class="nav-section-label">Daily</div>
+    <button class="nav-btn" onclick="showPage('daily',this)"><span class="nav-icon">📓</span> Today's Session</button>
+    <button class="nav-btn" onclick="showPage('weekly',this)"><span class="nav-icon">📅</span> Weekly View</button>
+    <button class="nav-btn" onclick="showPage('calendar',this)"><span class="nav-icon">🗓</span> Calendar</button>
+  </div>
+  <div class="nav-section" style="margin-top:8px;padding-top:16px;border-top:1px solid var(--border)">
+    <div class="nav-section-label">Data Backup</div>
+    <div style="padding:0 12px;display:flex;flex-direction:column;gap:6px;margin-bottom:12px">
+      <button onclick="exportData()" style="width:100%;padding:8px 10px;border-radius:6px;border:1px solid var(--green);background:var(--green-bg);color:var(--green);font-family:JetBrains Mono,monospace;font-size:11px;cursor:pointer;text-align:left;letter-spacing:0.06em">⬇ Export Data</button>
+      <label style="width:100%;padding:8px 10px;border-radius:6px;border:1px solid var(--border2);background:var(--card);color:var(--muted);font-family:JetBrains Mono,monospace;font-size:11px;cursor:pointer;text-align:left;letter-spacing:0.06em;display:block">⬆ Import Data<input type="file" id="import-file" accept=".json" onchange="importData(this)" style="display:none"></label>
+    </div>
+  </div>
+  <div class="nav-section" style="margin-top:8px;padding-top:16px;border-top:1px solid var(--border)">
+    <div class="nav-section-label">Quick Stats</div>
+    <div style="padding:8px 10px">
+      <div style="font-family:JetBrains Mono,monospace;font-size:9px;color:var(--muted);margin-bottom:4px">CURRENT MONTH</div>
+      <div id="sb-month" style="font-family:Cormorant Garamond,serif;font-size:18px;font-weight:700;color:var(--gold2)">Month 1</div>
+      <div style="font-family:JetBrains Mono,monospace;font-size:9px;color:var(--muted);margin-top:8px;margin-bottom:4px">ACCOUNTS</div>
+      <div id="sb-accounts" style="font-family:Cormorant Garamond,serif;font-size:18px;font-weight:700;color:var(--green)">1</div>
+      <div style="font-family:JetBrains Mono,monospace;font-size:9px;color:var(--muted);margin-top:8px;margin-bottom:4px">TOTAL NET</div>
+      <div id="sb-total" style="font-family:Cormorant Garamond,serif;font-size:18px;font-weight:700;color:var(--green)">$0</div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+<!-- ══ ROADMAP ══ -->
+<div id="page-roadmap" class="page active">
+  <div class="page-hdr">
+    <div><h1>6-Month <span>Roadmap</span></h1><div style="font-family:JetBrains Mono,monospace;font-size:11px;color:var(--muted);margin-top:6px">Topstep · NQ/MNQ · Copy Trading Scale Plan</div></div>
+    <div class="hdr-meta">$300 gross/day target<br>50% prop split · 28% NYC tax</div>
+  </div>
+  <div class="sl">Monthly Progression — Click any month for full details</div>
+  <div class="roadmap-grid" id="roadmapGrid"></div>
+  <div class="sl">Core Principles</div>
+  <div id="coreRules"></div>
+</div>
+
+<!-- ══ RULES ══ -->
+<div id="page-rules" class="page">
+  <div class="page-hdr"><h1>Trading <span>Rules</span></h1><div class="hdr-meta">Non-negotiable · Read every morning</div></div>
+  <div id="rulesContent"></div>
+</div>
+
+<!-- ══ SETUP TRACKER ══ -->
+<div id="page-setups" class="page">
+  <div class="page-hdr">
+    <div><h1>Setup <span>Tracker</span></h1><div style="font-family:JetBrains Mono,monospace;font-size:11px;color:var(--muted);margin-top:6px">Win rate and record per setup</div></div>
+    <div class="hdr-meta">Auto-updated from trade logs</div>
+  </div>
+  <div class="sl">Add a New Setup</div>
+  <div class="setup-add-row">
+    <input type="text" id="new-setup-name" placeholder="e.g. First 15 Breakout, EMA Bounce, VWAP Reclaim..." maxlength="40">
+    <button class="setup-add-btn" onclick="addSetup()">+ Add Setup</button>
+  </div>
+  <div class="sl">Your Setups — Win Rate & Record</div>
+  <div class="setup-cards" id="setupCards"></div>
+  <div class="sl" style="margin-top:8px">All Setup Trades Log</div>
+  <div class="wb-card">
+    <div class="wb-card-hdr"><div class="wh-title">📊 Full Setup Trade History</div></div>
+    <div class="wb-card-body" style="padding:0">
+      <table class="trade-log-table" style="width:100%">
+        <thead><tr><th>Date</th><th>Setup</th><th>Direction</th><th>Gross P&L</th><th>Net (after split+tax)</th><th>Result</th></tr></thead>
+        <tbody id="allSetupLog"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══ DAILY WORKBOOK ══ -->
+<div id="page-daily" class="page">
+  <div class="page-hdr">
+    <div><h1>Daily <span>Workbook</span></h1><div id="daily-date-disp" style="font-family:JetBrains Mono,monospace;font-size:11px;color:var(--muted);margin-top:6px"></div></div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <input type="date" id="date-picker" style="background:var(--card);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:JetBrains Mono,monospace;font-size:12px;padding:7px 12px;outline:none;cursor:pointer">
+      <select id="month-select" onchange="updateMonthSettings()" style="background:var(--card);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:JetBrains Mono,monospace;font-size:11px;padding:7px 10px;outline:none">
+        <option value="1">Month 1</option><option value="2">Month 2</option><option value="3">Month 3</option>
+        <option value="4">Month 4</option><option value="5">Month 5</option><option value="6">Month 6</option>
+      </select>
+      <button class="save-btn" onclick="saveDay()">SAVE DAY</button>
+    </div>
+  </div>
+
+  <!-- QUICK ENTRY CARD -->
+  <div id="quick-entry-card" style="background:var(--card);border:2px solid var(--border2);border-radius:12px;padding:20px 24px;margin-bottom:16px;display:flex;align-items:center;gap:24px;flex-wrap:wrap;transition:border-color 0.3s">
+    <div style="flex:none">
+      <div style="font-family:JetBrains Mono,monospace;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">&#x1F4B0; How much did I make today? (net take-home)</div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-family:Cormorant Garamond,serif;font-size:32px;font-weight:700;color:var(--muted)">$</span>
+        <input type="number" id="quick-pnl" placeholder="0" step="1" oninput="onQuickPnl(this)"
+          style="background:var(--bg);border:2px solid var(--border2);border-radius:8px;color:var(--text);font-family:Cormorant Garamond,serif;font-size:44px;font-weight:700;padding:4px 12px;width:210px;outline:none;transition:border-color 0.2s,color 0.2s;-moz-appearance:textfield">
+      </div>
+    </div>
+    <div style="flex:1;min-width:180px">
+      <div id="quick-result-label" style="font-family:JetBrains Mono,monospace;font-size:10px;color:var(--muted);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:6px">Enter an amount above</div>
+      <div id="quick-result-display" style="font-family:Cormorant Garamond,serif;font-size:56px;font-weight:700;line-height:1;color:var(--muted);transition:color 0.25s,transform 0.2s">—</div>
+      <div id="quick-result-sub" style="font-family:JetBrains Mono,monospace;font-size:10px;color:var(--muted);margin-top:4px"></div>
+    </div>
+    <div id="quick-vs-target" style="flex:none;text-align:right;display:none">
+      <div style="font-family:JetBrains Mono,monospace;font-size:9px;color:var(--muted);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:4px">vs target</div>
+      <div id="quick-vs-val" style="font-family:Cormorant Garamond,serif;font-size:22px;font-weight:700;line-height:1"></div>
+      <div id="quick-vs-bar-wrap" style="height:6px;background:var(--border);border-radius:3px;width:120px;margin-top:8px;overflow:hidden">
+        <div id="quick-vs-bar" style="height:100%;border-radius:3px;transition:width 0.4s,background 0.3s;width:0%"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- P&L SUMMARY -->
+  <div class="pnl-summary">
+    <div><div class="pi-label">Gross P&L</div><div class="pi-val" id="sum-gross" style="color:#fff">$0</div><div class="pi-sub">before split</div></div>
+    <div><div class="pi-label">Your 50% Share</div><div class="pi-val" id="sum-share" style="color:var(--gold2)">$0</div><div class="pi-sub">prop split</div></div>
+    <div><div class="pi-label">Net After Tax</div><div class="pi-val" id="sum-net" style="color:var(--green)">$0</div><div class="pi-sub">~28% NYC rate</div></div>
+    <div><div class="pi-label">Daily Target</div><div class="pi-val" id="sum-target" style="color:var(--gold2)">$150</div><div class="pi-sub">net goal/acct</div></div>
+    <div><div class="pi-label">Status</div><div class="pi-val" id="sum-status" style="font-size:18px;color:var(--muted)">—</div><div class="pi-sub" id="sum-status-sub">no trades yet</div></div>
+  </div>
+
+  <div id="session-limits-strip" style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px 16px;margin-bottom:20px;font-family:JetBrains Mono,monospace;font-size:10px;color:var(--muted);display:flex;gap:20px;flex-wrap:wrap"></div>
+
+  <div class="two-col">
+    <!-- Pre-Market Checklist -->
+    <div class="wb-card">
+      <div class="wb-card-hdr"><div class="wh-title">🌅 Pre-Market Checklist</div><div id="pre-count" style="font-family:JetBrains Mono,monospace;font-size:9px;color:var(--muted)">0/7</div></div>
+      <div class="wb-card-body">
+        <ul class="checklist" id="preChecklist">
+          <li class="check-item" onclick="toggleCheck(this,'pre')"><div class="check-box"></div><div class="check-label">Checked overnight NQ range & key levels<span class="check-sub">Know yesterday H/L + overnight session range</span></div></li>
+          <li class="check-item" onclick="toggleCheck(this,'pre')"><div class="check-box"></div><div class="check-label">PDLL set in TopstepX before any trade<span class="check-sub">Non-negotiable — no PDLL = no trading</span></div></li>
+          <li class="check-item" onclick="toggleCheck(this,'pre')"><div class="check-box"></div><div class="check-label">Wrote today's target & hard stop on paper<span class="check-sub">Physical note makes it real</span></div></li>
+          <li class="check-item" onclick="toggleCheck(this,'pre')"><div class="check-box"></div><div class="check-label">Checked economic calendar<span class="check-sub">CPI/FOMC/NFP = half size or no trade</span></div></li>
+          <li class="check-item" onclick="toggleCheck(this,'pre')"><div class="check-box"></div><div class="check-label">Rated mental state 1–10<span class="check-sub">Below 6 = half size. Below 4 = no trade</span></div></li>
+          <li class="check-item" onclick="toggleCheck(this,'pre')"><div class="check-box"></div><div class="check-label">Identified first 15-min high & low<span class="check-sub">Key breakout reference for the session</span></div></li>
+          <li class="check-item" onclick="toggleCheck(this,'pre')"><div class="check-box"></div><div class="check-label">Noted VWAP + 9 EMA directional bias<span class="check-sub">Above = bullish lean · Below = bearish lean</span></div></li>
+        </ul>
+      </div>
+    </div>
+    <!-- Post-Market Checklist -->
+    <div class="wb-card">
+      <div class="wb-card-hdr"><div class="wh-title">🌙 Post-Session Checklist</div><div id="post-count" style="font-family:JetBrains Mono,monospace;font-size:9px;color:var(--muted)">0/5</div></div>
+      <div class="wb-card-body">
+        <ul class="checklist" id="postChecklist">
+          <li class="check-item" onclick="toggleCheck(this,'post')"><div class="check-box"></div><div class="check-label">Logged all trades below<span class="check-sub">Every entry, exit, setup — no skipping</span></div></li>
+          <li class="check-item" onclick="toggleCheck(this,'post')"><div class="check-box"></div><div class="check-label">Checked remaining drawdown on all accounts<span class="check-sub">If 50% used on any account → halve size tomorrow</span></div></li>
+          <li class="check-item" onclick="toggleCheck(this,'post')"><div class="check-box"></div><div class="check-label">Wrote session notes<span class="check-sub">One honest sentence minimum</span></div></li>
+          <li class="check-item" onclick="toggleCheck(this,'post')"><div class="check-box"></div><div class="check-label">Rated execution quality 1–10<span class="check-sub">Separate from P&L — did you follow the plan?</span></div></li>
+          <li class="check-item" onclick="toggleCheck(this,'post')"><div class="check-box"></div><div class="check-label">Friday: transferred investment allocation<span class="check-sub">Roth IRA + index fund deposit after payout</span></div></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- TRADE LOG -->
+  <div class="wb-card">
+    <div class="wb-card-hdr">
+      <div class="wh-title">📊 Trade Log — Enter Each Trade</div>
+      <div style="font-family:JetBrains Mono,monospace;font-size:9px;color:var(--muted)">P&L auto-totals below</div>
+    </div>
+    <div class="wb-card-body" style="padding:0 16px 16px">
+      <table class="trade-log-table" style="width:100%;margin-top:8px">
+        <thead>
+          <tr>
+            <th style="width:70px">Time</th>
+            <th style="width:160px">Setup Used</th>
+            <th style="width:80px">Direction</th>
+            <th style="width:110px">Gross P&L ($)</th>
+            <th style="width:80px">Result</th>
+            <th style="width:30px"></th>
+          </tr>
+        </thead>
+        <tbody id="tradeLogBody"></tbody>
+      </table>
+      <button class="add-trade-btn" onclick="addTradeRow()">+ Add Trade Row</button>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <!-- Mental State -->
+    <div class="wb-card">
+      <div class="wb-card-hdr"><div class="wh-title">🧠 Mental State</div></div>
+      <div class="wb-card-body">
+        <label class="form-label">Pre-session emotion</label>
+        <div class="emotion-row" id="preEmotion">
+          <button class="emo-btn" onclick="selectEmo(this,'pre')">😌 Calm</button>
+          <button class="emo-btn" onclick="selectEmo(this,'pre')">💪 Focused</button>
+          <button class="emo-btn" onclick="selectEmo(this,'pre')">😤 Frustrated</button>
+          <button class="emo-btn" onclick="selectEmo(this,'pre')">😰 Anxious</button>
+          <button class="emo-btn" onclick="selectEmo(this,'pre')">🤩 Overconfident</button>
+          <button class="emo-btn" onclick="selectEmo(this,'pre')">😴 Tired</button>
+        </div>
+        <label class="form-label" style="margin-top:12px">Post-session emotion</label>
+        <div class="emotion-row" id="postEmotion">
+          <button class="emo-btn" onclick="selectEmo(this,'post')">😌 Satisfied</button>
+          <button class="emo-btn" onclick="selectEmo(this,'post')">😤 Frustrated</button>
+          <button class="emo-btn" onclick="selectEmo(this,'post')">😔 Disappointed</button>
+          <button class="emo-btn" onclick="selectEmo(this,'post')">😤 Revenge urge</button>
+          <button class="emo-btn" onclick="selectEmo(this,'post')">💪 Disciplined</button>
+          <button class="emo-btn" onclick="selectEmo(this,'post')">😐 Neutral</button>
+        </div>
+        <div style="display:flex;gap:16px;margin-top:12px">
+          <div><label class="form-label">Mental score (1–10)</label><input type="number" id="mental-score" class="num-input" min="1" max="10" placeholder="7"></div>
+          <div><label class="form-label">Execution score (1–10)</label><input type="number" id="exec-score" class="num-input" min="1" max="10" placeholder="8"></div>
+        </div>
+      </div>
+    </div>
+    <!-- Notes -->
+    <div class="wb-card">
+      <div class="wb-card-hdr"><div class="wh-title">📝 Session Notes</div></div>
+      <div class="wb-card-body">
+        <label class="form-label">What happened today</label>
+        <textarea class="notes-area" id="notes-what" placeholder="Market condition, entries, what worked and what didn't..."></textarea>
+        <label class="form-label" style="margin-top:10px">One thing to improve tomorrow</label>
+        <textarea class="notes-area" id="notes-improve" style="min-height:56px" placeholder="Be specific — not 'trade better', what exact behavior?"></textarea>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ WEEKLY ══ -->
+<div id="page-weekly" class="page">
+  <div class="page-hdr"><h1>Weekly <span>View</span></h1><div class="hdr-meta" id="week-label">Current Week</div></div>
+  <div class="sl">This Week's Sessions</div>
+  <div class="week-grid" id="weekGrid"></div>
+  <div class="sl">Weekly Summary</div>
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px 24px;display:grid;grid-template-columns:repeat(4,1fr);gap:16px">
+    <div><div style="font-family:JetBrains Mono,monospace;font-size:9px;color:var(--muted);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:6px">Weekly Gross (your 50%)</div><div id="wk-gross" style="font-family:Cormorant Garamond,serif;font-size:28px;font-weight:700;color:var(--gold2)">$0</div></div>
+    <div><div style="font-family:JetBrains Mono,monospace;font-size:9px;color:var(--muted);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:6px">Weekly Net</div><div id="wk-net" style="font-family:Cormorant Garamond,serif;font-size:28px;font-weight:700;color:var(--green)">$0</div></div>
+    <div><div style="font-family:JetBrains Mono,monospace;font-size:9px;color:var(--muted);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:6px">Green Days</div><div id="wk-green" style="font-family:Cormorant Garamond,serif;font-size:28px;font-weight:700;color:var(--green)">0/5</div></div>
+    <div><div style="font-family:JetBrains Mono,monospace;font-size:9px;color:var(--muted);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:6px">Worst Day</div><div id="wk-worst" style="font-family:Cormorant Garamond,serif;font-size:28px;font-weight:700;color:var(--red)">$0</div></div>
+  </div>
+</div>
+
+<!-- ══ CALENDAR ══ -->
+<div id="page-calendar" class="page">
+  <div class="page-hdr"><h1>Trading <span>Calendar</span></h1><div class="hdr-meta">Daily P&L at a glance</div></div>
+  <div class="cal-nav">
+    <button class="cal-nav-btn" onclick="calPrev()">← Prev</button>
+    <div class="cal-month-title" id="cal-title">April 2026</div>
+    <button class="cal-nav-btn" onclick="calNext()">Next →</button>
+  </div>
+  <div class="cal-grid-wrap">
+    <div class="cal-dow-hdr">
+      <div class="cal-dow-cell">Sun</div><div class="cal-dow-cell">Mon</div><div class="cal-dow-cell">Tue</div>
+      <div class="cal-dow-cell">Wed</div><div class="cal-dow-cell">Thu</div><div class="cal-dow-cell">Fri</div><div class="cal-dow-cell">Sat</div>
+    </div>
+    <div class="cal-body" id="calBody"></div>
+  </div>
+  <div class="sl">Month Summary</div>
+  <div class="cal-month-summary">
+    <div class="cms-item"><div class="cms-label">Trading Days</div><div class="cms-val" id="cms-days" style="color:var(--text)">0</div></div>
+    <div class="cms-item"><div class="cms-label">Month Gross (your 50%)</div><div class="cms-val" id="cms-gross" style="color:var(--gold2)">$0</div></div>
+    <div class="cms-item"><div class="cms-label">Month Net</div><div class="cms-val" id="cms-net" style="color:var(--green)">$0</div></div>
+    <div class="cms-item"><div class="cms-label">Win Rate</div><div class="cms-val" id="cms-wr" style="color:var(--blue)">—</div></div>
+  </div>
+</div>
+
+<!-- ══ PROGRESS ══ -->
+<div id="page-progress" class="page">
+  <div class="page-hdr"><h1>Progress <span>Tracker</span></h1><div class="hdr-meta">All time · From daily logs</div></div>
+  <div class="sl">Cumulative Stats</div>
+  <div class="progress-strip">
+    <div class="prog-card"><div class="pc-label">Total Net Earned</div><div class="pc-val" id="prog-total" style="color:var(--green)">$0</div><div class="pc-sub">after tax + split</div></div>
+    <div class="prog-card"><div class="pc-label">Sessions Logged</div><div class="pc-val" id="prog-days" style="color:var(--gold2)">0</div><div class="pc-sub">trading days</div></div>
+    <div class="prog-card"><div class="pc-label">Win Rate</div><div class="pc-val" id="prog-wr" style="color:var(--blue)">—</div><div class="pc-sub">green days / total</div></div>
+    <div class="prog-card"><div class="pc-label">Best Day Net</div><div class="pc-val" id="prog-best" style="color:var(--green)">$0</div><div class="pc-sub">single session</div></div>
+    <div class="prog-card"><div class="pc-label">Worst Day Net</div><div class="pc-val" id="prog-worst" style="color:var(--red)">$0</div><div class="pc-sub">single session</div></div>
+    <div class="prog-card"><div class="pc-label">Avg Day Net</div><div class="pc-val" id="prog-avg" style="color:var(--text)">$0</div><div class="pc-sub">per session</div></div>
+  </div>
+  <div class="sl">Investment Tracker</div>
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px 24px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px">
+    <div><div style="font-family:JetBrains Mono,monospace;font-size:9px;color:var(--muted);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:6px">Roth IRA</div><div style="font-family:Cormorant Garamond,serif;font-size:28px;font-weight:700;color:var(--green)" id="inv-roth">$0</div><input type="number" placeholder="Update total" style="margin-top:6px;background:var(--bg);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:JetBrains Mono,monospace;font-size:11px;padding:5px 8px;width:100%;outline:none" oninput="updateInv('roth',this.value)"></div>
+    <div><div style="font-family:JetBrains Mono,monospace;font-size:9px;color:var(--muted);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:6px">Index Funds (VOO/QQQ)</div><div style="font-family:Cormorant Garamond,serif;font-size:28px;font-weight:700;color:var(--blue)" id="inv-index">$0</div><input type="number" placeholder="Update total" style="margin-top:6px;background:var(--bg);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:JetBrains Mono,monospace;font-size:11px;padding:5px 8px;width:100%;outline:none" oninput="updateInv('index',this.value)"></div>
+    <div><div style="font-family:JetBrains Mono,monospace;font-size:9px;color:var(--muted);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:6px">HYSA / Emergency Fund</div><div style="font-family:Cormorant Garamond,serif;font-size:28px;font-weight:700;color:var(--gold2)" id="inv-hysa">$0</div><input type="number" placeholder="Update total" style="margin-top:6px;background:var(--bg);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:JetBrains Mono,monospace;font-size:11px;padding:5px 8px;width:100%;outline:none" oninput="updateInv('hysa',this.value)"></div>
+  </div>
+</div>
+
+<!-- ══ JOURNAL LIST ══ -->
+<div id="page-journal" class="page">
+  <div class="page-hdr">
+    <div><h1>Journal <span>List</span></h1><div style="font-family:JetBrains Mono,monospace;font-size:11px;color:var(--muted);margin-top:6px">Every session note — searchable & dated</div></div>
+    <div id="journal-count" class="hdr-meta"></div>
+  </div>
+  <input class="journal-search" id="journal-search" placeholder="Search journals by keyword, date, or emotion..." oninput="filterJournals(this.value)">
+  <div class="sl">Session Notes — Most Recent First</div>
+  <div class="journal-list" id="journalList"></div>
+</div>
+
+<!-- ══ ANALYTICS ══ -->
+<div id="page-analytics" class="page">
+  <div class="page-hdr">
+    <div><h1>Trading <span>Analytics</span></h1><div style="font-family:JetBrains Mono,monospace;font-size:11px;color:var(--muted);margin-top:6px">Full journey stats & performance data</div></div>
+    <div class="hdr-meta" id="an-date-range"></div>
+  </div>
+  <div class="sl">Key Metrics</div>
+  <div class="analytics-grid" id="anGrid"></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px">
+    <div>
+      <div class="sl">Win / Loss Distribution</div>
+      <div class="wb-card"><div class="wb-card-body" id="anDist"></div></div>
+    </div>
+    <div>
+      <div class="sl">P&L by Day of Week</div>
+      <div class="wb-card"><div class="wb-card-body" id="anDow"></div></div>
+    </div>
+  </div>
+  <div class="sl">30-Day Streak (Most Recent)</div>
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:24px">
+    <div class="streak-bar" id="anStreak"></div>
+    <div style="display:flex;gap:16px;margin-top:10px;font-family:JetBrains Mono,monospace;font-size:9px;color:var(--muted)">
+      <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:var(--green);display:inline-block"></span> Green day</span>
+      <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:var(--red);display:inline-block"></span> Red day</span>
+      <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:var(--border2);display:inline-block"></span> No log</span>
+    </div>
+  </div>
+  <div class="sl">All Logged Sessions</div>
+  <div class="wb-card"><div class="wb-card-body" style="padding:0">
+    <table class="an-table" style="width:100%">
+      <thead><tr><th>Date</th><th>Day</th><th>Net</th><th>Your Share</th><th>Gross</th><th>Trades</th><th>Mental</th><th>Exec</th><th>Pre ✓</th></tr></thead>
+      <tbody id="anTable"></tbody>
+    </table>
+  </div></div>
+</div>
+
+<!-- ══ THEMES ══ -->
+<div id="page-themes" class="page">
+  <div class="page-hdr">
+    <div><h1>Themes & <span>Style</span></h1><div style="font-family:JetBrains Mono,monospace;font-size:11px;color:var(--muted);margin-top:6px">Customize your workbook appearance</div></div>
+  </div>
+  <div class="sl">Light / Dark Mode</div>
+  <div class="dark-light-row">
+    <span style="font-size:18px">🌙</span>
+    <label class="toggle-switch">
+      <input type="checkbox" id="light-toggle" onchange="toggleLight(this)">
+      <span class="toggle-slider"></span>
+    </label>
+    <span style="font-size:18px">☀️</span>
+    <span class="dl-label" id="dl-label-text">Currently: Dark Mode</span>
+  </div>
+  <div class="sl">Color Themes</div>
+  <div class="theme-grid" id="themeGrid"></div>
+  <div class="sl">Font Style</div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:32px">
+    <div class="theme-swatch" id="font-default" onclick="setFont('default',this)">
+      <div style="font-family:Cormorant Garamond,serif;font-size:20px;color:var(--text);margin-bottom:6px">Aa</div>
+      <div class="sw-name">Default</div>
+    </div>
+    <div class="theme-swatch" id="font-mono" onclick="setFont('mono',this)">
+      <div style="font-family:JetBrains Mono,monospace;font-size:16px;color:var(--text);margin-bottom:6px">Aa</div>
+      <div class="sw-name">Mono</div>
+    </div>
+    <div class="theme-swatch" id="font-sans" onclick="setFont('sans',this)">
+      <div style="font-family:DM Sans,sans-serif;font-size:18px;font-weight:700;color:var(--text);margin-bottom:6px">Aa</div>
+      <div class="sw-name">Clean Sans</div>
+    </div>
+  </div>
+  <div class="sl">Preview</div>
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:28px;text-align:center">
+    <div style="font-family:Cormorant Garamond,serif;font-size:42px;font-weight:700;color:var(--gold2);margin-bottom:8px">$2,160</div>
+    <div style="font-family:JetBrains Mono,monospace;font-size:11px;color:var(--muted);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:16px">Monthly Net · Theme Preview</div>
+    <div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap">
+      <span style="background:var(--green-bg);border:1px solid var(--green);border-radius:6px;padding:6px 14px;font-family:JetBrains Mono,monospace;font-size:11px;color:var(--green)">+$150 Green Day</span>
+      <span style="background:var(--red-bg);border:1px solid var(--red);border-radius:6px;padding:6px 14px;font-family:JetBrains Mono,monospace;font-size:11px;color:var(--red)">-$75 Red Day</span>
+      <span style="background:var(--gold-bg);border:1px solid var(--gold);border-radius:6px;padding:6px 14px;font-family:JetBrains Mono,monospace;font-size:11px;color:var(--gold2)">$300 Target</span>
+    </div>
+  </div>
+</div>
+
+</div><!-- end main -->
+</div><!-- end app -->
+
+<!-- MODAL -->
+<div class="modal-overlay" id="monthModal" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-hdr"><div class="modal-title" id="modal-title">Month 1</div><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <div class="modal-stat-grid" id="modal-stats"></div>
+    <div style="font-family:JetBrains Mono,monospace;font-size:9px;color:var(--muted);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:10px">Monthly Goals</div>
+    <div id="modal-goals"></div>
+  </div>
+</div>
+<div class="save-indicator" id="saveInd">✓ Saved</div>
+
+<script>
+// ═══════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════
+const MONTHS = [
+  {num:1,label:'Month 1',badge:'badge-active',badgeText:'PROVE IT',accounts:1,grossTarget:300,netTarget:150,hardStop:200,softStop:150,walkAway:100,monthlyGross:3000,monthlyNet:2160,focus:'Consistency over profit. Prove the $75 stop can be respected every single day.',goals:['3+ green days out of 5 every week','Never break the $200 hard stop — not once','Complete trade log every single session','Build $1,500 emergency fund from payouts','Get at least one Topstep payout','Rate mental state before every session']},
+  {num:2,label:'Month 2',badge:'badge-scale',badgeText:'SCALE x2',accounts:2,grossTarget:400,netTarget:200,hardStop:250,softStop:175,walkAway:130,monthlyGross:8000,monthlyNet:4320,focus:'Pass second combine. Enable TopstepX copy trading. Invest 40% of net.',goals:['Pass second Topstep combine (~$165)','Set up TopstepX copy trading — Lead + Follower','Complete emergency fund ($1,500–$2,000)','Open Roth IRA and make first deposit','Invest $3,820 into VOO/QQQ index funds','Both accounts profitable — no payout denials']},
+  {num:3,label:'Month 3',badge:'badge-scale',badgeText:'SCALE x3',accounts:3,grossTarget:500,netTarget:250,hardStop:300,softStop:200,walkAway:165,monthlyGross:15000,monthlyNet:6480,focus:'Add third account. Raise gross target to $500/acct. Invest 50% of net.',goals:['Pass third Topstep combine','Add Account 3 as second Follower in TopstepX','Max Roth IRA on pace ($583/month)','Invest $2,000/month into VOO/QQQ','Show 3 consecutive green weeks across all accounts','Trading journal showing consistent 3+ green days/week']},
+  {num:4,label:'Month 4',badge:'badge-consol',badgeText:'SOLIDIFY',accounts:3,grossTarget:600,netTarget:300,hardStop:350,softStop:225,walkAway:200,monthlyGross:18000,monthlyNet:12960,focus:'NO new accounts. Solidify 3-account execution. Evaluate split renegotiation.',goals:['All 3 accounts: full month profitable','Request Topstep split review (aim for 60/40 or 70/30)','Continue $583/month Roth IRA contributions','Diagnose any copy trading execution drift','Cumulative invested should reach $10,000+','Emergency fund fully intact — never touched']},
+  {num:5,label:'Month 5',badge:'badge-scale',badgeText:'SCALE x4',accounts:4,grossTarget:700,netTarget:350,hardStop:400,softStop:250,walkAway:230,monthlyGross:28000,monthlyNet:20160,focus:'Add fourth account. Raise target to $700/acct. Consult CPA — tax bracket shifting.',goals:['Pass fourth Topstep combine','Add Account 4 to copy trading chain','Schedule CPA consultation — SE tax + Solo 401(k)','Max Roth IRA for the year','Invest $3,000+/month into index funds','Start researching Solo 401(k) setup']},
+  {num:6,label:'Month 6',badge:'badge-scale',badgeText:'FULL SCALE',accounts:5,grossTarget:800,netTarget:400,hardStop:450,softStop:275,walkAway:260,monthlyGross:40000,monthlyNet:28800,focus:'Maximum 5 accounts. $800 gross target. Plan Year 2. File estimated taxes.',goals:['Add fifth and final Topstep Express account','Total ~$20,000+ invested across all vehicles','File quarterly estimated taxes (avoid IRS penalty)','Review and rebalance investment positions','Set Year 2 targets based on 6-month data','Consider Live Funded Account application if eligible']},
+];
+
+const DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday'];
+const MONTH_NAMES_LONG = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+// ═══════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════
+let dayData = {};       // { 'YYYY-MM-DD': { gross, net, trades:[], ... } }
+let setups = [];        // [{ id, name }]
+let investments = { roth:0, index:0, hysa:0 };
+let calYear = 2026, calMonth = 3; // 0-indexed month
+
+function $fmt(n) {
+  if (n === undefined || n === null || isNaN(n)) return '$0';
+  const abs = Math.abs(Math.round(n));
+  return (n < 0 ? '-$' : '$') + abs.toLocaleString('en-US');
+}
+
+function save() {
+  try { localStorage.setItem('twb2', JSON.stringify({ dayData, setups, investments })); } catch(e) {}
+  showSaveInd();
+  updateSidebar();
+}
+
+function load() {
+  try {
+    const d = localStorage.getItem('twb2');
+    if (d) { const p = JSON.parse(d); dayData = p.dayData||{}; setups = p.setups||[]; investments = p.investments||{roth:0,index:0,hysa:0}; }
+  } catch(e) {}
+}
+
+function showSaveInd() {
+  const el = document.getElementById('saveInd');
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 1800);
+}
+
+function updateSidebar() {
+  const days = Object.values(dayData);
+  const totalNet = days.reduce((a,d) => a + (d.net||0), 0);
+  document.getElementById('sb-total').textContent = $fmt(totalNet);
+  document.getElementById('sb-total').style.color = totalNet >= 0 ? 'var(--green)' : 'var(--red)';
+}
+
+// ═══════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════
+function showPage(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  if (btn) btn.classList.add('active');
+  if (id === 'weekly') buildWeekly();
+  if (id === 'calendar') buildCalendar();
+  if (id === 'progress') buildProgress();
+  if (id === 'setups') buildSetups();
+  if (id === 'journal') buildJournal('');
+  if (id === 'analytics') buildAnalytics();
+  if (id === 'themes') { buildThemes(); }
+}
+
+// ═══════════════════════════════════════════════
+// ROADMAP
+// ═══════════════════════════════════════════════
+function buildRoadmap() {
+  const grid = document.getElementById('roadmapGrid');
+  grid.innerHTML = '';
+  MONTHS.forEach((m,i) => {
+    const card = document.createElement('div');
+    card.className = 'rm-card' + (i===0?' current':'');
+    card.onclick = () => openModal(m);
+    card.innerHTML = `<div class="rm-card-hdr"><div class="rm-month">${m.label}</div><div class="rm-badge ${m.badge}">${m.badgeText}</div></div>
+    <div class="rm-card-body">
+      <div class="rm-stat-row"><div class="rsl">Accounts</div><div class="rsv gold">${m.accounts}</div></div>
+      <div class="rm-stat-row"><div class="rsl">Gross Target/Acct</div><div class="rsv">${$fmt(m.grossTarget)}/day</div></div>
+      <div class="rm-stat-row"><div class="rsl">Net Target/Acct</div><div class="rsv gold">${$fmt(m.netTarget)}/day</div></div>
+      <div class="rm-stat-row"><div class="rsl">Hard Stop</div><div class="rsv red">${$fmt(m.hardStop)}/day</div></div>
+      <div class="rm-stat-row"><div class="rsl">Monthly Net Est.</div><div class="rsv green">${$fmt(m.monthlyNet)}</div></div>
+      <div class="rm-goal">${m.focus}</div>
+    </div>`;
+    grid.appendChild(card);
+  });
+
+  document.getElementById('coreRules').innerHTML = [
+    ['01','<strong>One account first.</strong> Month 1 is proof of concept. No second account until you have one full month of clean, consistent, stop-respecting data.'],
+    ['02','<strong>The drawdown is not your stop.</strong> Topstep\'s $2,000 max drawdown is the fire alarm. Your personal PDLL is the smoke detector. Never let it reach the alarm.'],
+    ['03','<strong>Investment fund is untouchable.</strong> 40–55% of net income goes to Roth IRA + index funds. It does not cover trading losses. Ever.'],
+    ['04','<strong>Raise targets by data, not desire.</strong> Increase daily targets in 25% increments only after 2 consecutive weeks of hitting the current target.'],
+    ['05','<strong>Friday is Monday.</strong> Same rules, same stops, same mindset. No makeup trading on the last day of the week.'],
+  ].map(([n,t]) => `<div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:14px 18px;display:flex;align-items:flex-start;gap:14px;margin-bottom:8px"><div style="font-family:JetBrains Mono,monospace;font-size:11px;color:var(--gold2);background:var(--gold-bg);border:1px solid rgba(201,168,76,0.2);border-radius:4px;padding:3px 8px;flex-shrink:0">${n}</div><div style="font-size:13px;color:var(--text);line-height:1.5">${t}</div></div>`).join('');
+}
+
+function openModal(m) {
+  document.getElementById('modal-title').textContent = m.label + ' — ' + m.badgeText;
+  document.getElementById('modal-stats').innerHTML = [
+    {l:'Accounts',v:m.accounts,c:'var(--gold2)'},{l:'Gross Target',v:$fmt(m.grossTarget)+'/day',c:'var(--text)'},
+    {l:'Net Target',v:$fmt(m.netTarget)+'/day',c:'var(--green)'},{l:'Hard Stop',v:$fmt(m.hardStop),c:'var(--red)'},
+    {l:'Soft Stop',v:$fmt(m.softStop),c:'var(--gold2)'},{l:'Walk Away',v:$fmt(m.walkAway),c:'var(--green)'},
+    {l:'Monthly Gross',v:$fmt(m.monthlyGross),c:'var(--text)'},{l:'Monthly Net',v:$fmt(m.monthlyNet),c:'var(--green)'},
+  ].map(s=>`<div class="ms-item"><div class="msi-label">${s.l}</div><div class="msi-val" style="color:${s.c}">${s.v}</div></div>`).join('');
+  document.getElementById('modal-goals').innerHTML = m.goals.map(g=>`<div class="mgl-item">${g}</div>`).join('');
+  document.getElementById('monthModal').classList.add('open');
+}
+function closeModal() { document.getElementById('monthModal').classList.remove('open'); }
+
+// ═══════════════════════════════════════════════
+// RULES PAGE
+// ═══════════════════════════════════════════════
+function buildRules() {
+  const sections = [
+    {icon:'🌅',title:'Pre-Market (Before 9:00 AM)',rules:['Check overnight NQ range and key levels. Know where yesterday\'s high/low and overnight session range are before the open.','Set your <strong>PDLL in TopstepX</strong> before touching a single trade. If it\'s not set, you don\'t trade.','Write down today\'s profit target and hard stop in your workbook. Make it physical.','Check economic calendar — <strong>CPI, FOMC, NFP days</strong> require halved size or no trading.','Rate your mental state 1–10. If below 6, <span class="rule-red">reduce size by 50%.</span> If below 4, <span class="rule-red">do not trade today.</span>']},
+    {icon:'📊',title:'First 15 Minutes (9:30–9:45 AM)',rules:['<strong>Do not enter a trade in the first 5 minutes.</strong> Watch. Let the market show its hand.','Identify the <strong>first 15-minute high and low.</strong> These are your key breakout levels.','Note whether price is above or below VWAP and 9 EMA. This sets your directional bias.','If the first 5 candles are all inside the first candle\'s range — <strong>stay out.</strong> Choppy open = no edge.']},
+    {icon:'⚡',title:'During Trading',rules:['<strong>Soft stop reached:</strong> Stop. Step away for 10 minutes. Reassess. Resume only if loss was market conditions, not emotion.','<strong>Hard stop hit (PDLL):</strong> Platform closed immediately. No exceptions. Day is over.','<strong>3 consecutive losing trades:</strong> Stop regardless of dollar amount. Three losses in a row = you\'re not seeing the market clearly.','<strong>Walk-away target hit:</strong> You can stop here. If you continue, trail your stop — do not give back more than 30% of profit.','<strong>Daily target hit:</strong> Close the platform. Done. Greed after target is how green days turn red.','<span class="rule-red">Never average down on a losing trade.</span> If the trade is wrong, exit.']},
+    {icon:'🌙',title:'Post-Market (After Session)',rules:['Fill in the <strong>Daily Workbook</strong> — every trade, the setup used, the emotion, the result.','If it was a losing day: write one sentence about what happened without blame or excuse. Just the fact.','If it was a winning day: write what you did right. Reinforce the behavior you want to repeat.','Check drawdown remaining on each account. If any account is at 50% drawdown used — <strong>halve position sizes</strong> until it recovers.','Transfer investment allocation to Roth IRA / brokerage on <strong>every Friday</strong> after payout.']},
+    {icon:'🚫',title:'Absolute Hard Rules — Zero Tolerance',rules:['<span class="rule-red">Never trade without PDLL set in TopstepX.</span>','<span class="rule-red">Never revenge trade after hitting daily stop.</span>','<span class="rule-red">Never touch the investment fund to cover a trading loss.</span>','<span class="rule-red">Never add a new account after a losing month.</span>','<span class="rule-red">Never trade major news events impulsively — decide beforehand or don\'t trade them.</span>']},
+  ];
+  document.getElementById('rulesContent').innerHTML = sections.map(s => `
+    <div class="rule-block">
+      <div class="rule-block-hdr"><span style="font-size:16px">${s.icon}</span><span class="rb-title">${s.title}</span></div>
+      <div class="rule-block-body">${s.rules.map(r=>`<div class="rule-line">${r}</div>`).join('')}</div>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════════════
+// SETUP TRACKER
+// ═══════════════════════════════════════════════
+function addSetup() {
+  const inp = document.getElementById('new-setup-name');
+  const name = inp.value.trim();
+  if (!name) return;
+  if (setups.find(s => s.name.toLowerCase() === name.toLowerCase())) { inp.value=''; return; }
+  setups.push({ id: Date.now(), name });
+  inp.value = '';
+  save();
+  buildSetups();
+  rebuildSetupOptions();
+}
+
+function deleteSetup(id) {
+  setups = setups.filter(s => s.id !== id);
+  save();
+  buildSetups();
+  rebuildSetupOptions();
+}
+
+function getSetupStats(name) {
+  let wins=0, losses=0, be=0, totalPnl=0;
+  const log = [];
+  Object.entries(dayData).forEach(([date, d]) => {
+    if (!d.trades) return;
+    d.trades.forEach(t => {
+      if (t.setup && t.setup.toLowerCase() === name.toLowerCase()) {
+        const pnl = parseFloat(t.gross) || 0;
+        totalPnl += pnl;
+        if (t.result === 'WIN') wins++;
+        else if (t.result === 'LOSS') losses++;
+        else be++;
+        log.push({ date, pnl, result: t.result, dir: t.direction });
+      }
+    });
+  });
+  const total = wins + losses + be;
+  const wr = total > 0 ? Math.round((wins/total)*100) : null;
+  return { wins, losses, be, total, wr, totalPnl, log: log.sort((a,b) => b.date.localeCompare(a.date)) };
+}
+
+function buildSetups() {
+  const container = document.getElementById('setupCards');
+  if (setups.length === 0) {
+    container.innerHTML = '<div style="color:var(--muted);font-family:\'JetBrains Mono\',monospace;font-size:12px;padding:20px">No setups yet. Add one above.</div>';
+  } else {
+    container.innerHTML = setups.map(s => {
+      const st = getSetupStats(s.name);
+      const wrColor = st.wr === null ? 'var(--muted)' : st.wr >= 60 ? 'var(--green)' : st.wr >= 40 ? 'var(--gold2)' : 'var(--red)';
+      return `<div class="setup-card">
+        <div class="setup-card-hdr">
+          <div class="setup-name">${s.name}</div>
+          <button class="setup-del" onclick="deleteSetup(${s.id})">✕</button>
+        </div>
+        <div class="setup-card-body">
+          <div class="setup-stat"><div class="ssl">Win Rate</div><div class="ssv" style="color:${wrColor}">${st.wr !== null ? st.wr+'%' : '—'}</div></div>
+          <div class="setup-stat"><div class="ssl">Record</div><div class="ssv" style="color:var(--text)">${st.wins}W / ${st.losses}L / ${st.be}BE</div></div>
+          <div class="setup-stat"><div class="ssl">Total Trades</div><div class="ssv" style="color:var(--muted)">${st.total}</div></div>
+          <div class="setup-stat"><div class="ssl">Total Gross P&L</div><div class="ssv" style="color:${st.totalPnl>=0?'var(--green)':'var(--red)'}">${$fmt(st.totalPnl)}</div></div>
+          <div class="wr-bar-bg"><div class="wr-bar-fill" style="width:${st.wr||0}%"></div></div>
+          ${st.log.length > 0 ? `<div class="setup-log">${st.log.slice(0,8).map(l=>`<div class="setup-log-row"><span>${l.date}</span><span>${l.dir||''}</span><span class="slr-pnl ${l.pnl>=0?'pos':'neg'}">${$fmt(l.pnl)}</span><span style="color:${l.result==='WIN'?'var(--green)':l.result==='LOSS'?'var(--red)':'var(--muted)'}">${l.result}</span></div>`).join('')}</div>` : ''}
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  // Full log table
+  const allTrades = [];
+  Object.entries(dayData).forEach(([date, d]) => {
+    if (!d.trades) return;
+    d.trades.forEach(t => {
+      if (t.setup) allTrades.push({ date, ...t });
+    });
+  });
+  allTrades.sort((a,b) => b.date.localeCompare(a.date));
+  const tbody = document.getElementById('allSetupLog');
+  if (allTrades.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" style="padding:12px 16px;color:var(--muted);font-family:\'JetBrains Mono\',monospace;font-size:11px">No setup trades logged yet</td></tr>';
+  } else {
+    tbody.innerHTML = allTrades.map(t => {
+      const gross = parseFloat(t.gross)||0;
+      const net = gross * 0.5 * 0.72;
+      return `<tr>
+        <td style="color:var(--muted);font-family:JetBrains Mono,monospace;font-size:10px;padding:8px 10px">${t.date}</td>
+        <td style="font-size:12px;padding:8px 10px">${t.setup||'—'}</td>
+        <td style="font-family:JetBrains Mono,monospace;font-size:10px;padding:8px 10px;color:${t.direction==='LONG'?'var(--green)':t.direction==='SHORT'?'var(--red)':'var(--muted)'}">${t.direction||''}</td>
+        <td style="font-family:JetBrains Mono,monospace;font-size:12px;padding:8px 10px;color:${gross>=0?'var(--gold2)':'var(--red)'}">${$fmt(gross)}</td>
+        <td style="font-family:JetBrains Mono,monospace;font-size:12px;padding:8px 10px;color:${net>=0?'var(--green)':'var(--red)'}">${$fmt(net)}</td>
+        <td style="font-family:JetBrains Mono,monospace;font-size:10px;padding:8px 10px;color:${t.result==='WIN'?'var(--green)':t.result==='LOSS'?'var(--red)':'var(--muted)'}">${t.result||''}</td>
+      </tr>`;
+    }).join('');
+  }
+}
+
+function rebuildSetupOptions() {
+  document.querySelectorAll('.setup-select').forEach(sel => {
+    const cur = sel.value;
+    sel.innerHTML = '<option value="">— select setup —</option>' + setups.map(s=>`<option value="${s.name}"${s.name===cur?' selected':''}>${s.name}</option>`).join('');
+    sel.value = cur;
+  });
+}
+
+// ═══════════════════════════════════════════════
+// DAILY WORKBOOK
+// ═══════════════════════════════════════════════
+function initDaily() {
+  const today = new Date();
+  const iso = today.toISOString().slice(0,10);
+  document.getElementById('date-picker').value = iso;
+  updateDateDisp(iso);
+  updateMonthSettings();
+  addTradeRow();
+  addTradeRow();
+}
+
+function updateDateDisp(iso) {
+  const d = new Date(iso + 'T12:00:00');
+  document.getElementById('daily-date-disp').textContent = d.toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const dp = document.getElementById('date-picker');
+  if (dp) dp.addEventListener('change', e => { updateDateDisp(e.target.value); loadDay(e.target.value); });
+});
+
+function updateMonthSettings() {
+  const mo = parseInt(document.getElementById('month-select').value);
+  const m = MONTHS[mo-1];
+  const total = m.netTarget * m.accounts;
+  document.getElementById('sum-target').textContent = $fmt(total);
+  document.getElementById('session-limits-strip').innerHTML = [
+    `<span>🎯 Net Target: <strong style="color:var(--gold2)">${$fmt(total)}</strong></span>`,
+    `<span>✅ Walk Away: <strong style="color:var(--green)">${$fmt(m.walkAway * m.accounts)}</strong></span>`,
+    `<span>⚠️ Soft Stop: <strong style="color:var(--gold)">${$fmt(m.softStop * m.accounts)}</strong></span>`,
+    `<span>🛑 Hard Stop: <strong style="color:var(--red)">${$fmt(m.hardStop * m.accounts)}</strong></span>`,
+    `<span>📂 Accounts: <strong style="color:var(--text)">${m.accounts}</strong></span>`,
+  ].join('');
+  recalcPnL();
+}
+
+function toggleCheck(el, group) {
+  el.classList.toggle('checked');
+  const list = document.getElementById(group==='pre'?'preChecklist':'postChecklist');
+  const total = list.querySelectorAll('.check-item').length;
+  const done = list.querySelectorAll('.check-item.checked').length;
+  document.getElementById(group+'-count').textContent = done+'/'+total;
+}
+
+function addTradeRow() {
+  const tbody = document.getElementById('tradeLogBody');
+  const tr = document.createElement('tr');
+  const setupOpts = '<option value="">— select —</option>' + setups.map(s=>`<option value="${s.name}">${s.name}</option>`).join('');
+  tr.innerHTML = `
+    <td><input type="time" class="tl-input" value="09:30"></td>
+    <td><select class="tl-select setup-select" style="width:100%" onchange="recalcPnL()">${setupOpts}</select></td>
+    <td><select class="tl-select" style="width:100%"><option>LONG</option><option>SHORT</option></select></td>
+    <td><input type="number" class="tl-input pnl-field" placeholder="e.g. 250" step="10" oninput="onPnlInput(this)"></td>
+    <td><select class="tl-select result-select" style="width:100%"><option>WIN</option><option>LOSS</option><option>BE</option></select></td>
+    <td><button class="del-btn" onclick="this.closest('tr').remove();recalcPnL()">✕</button></td>
+  `;
+  tbody.appendChild(tr);
+}
+
+function onPnlInput(inp) {
+  const v = parseFloat(inp.value) || 0;
+  inp.classList.toggle('pos', v > 0);
+  inp.classList.toggle('neg', v < 0);
+  recalcPnL();
+}
+
+function onQuickPnl(inp) {
+  const val = parseFloat(inp.value);
+  const card = document.getElementById('quick-entry-card');
+  const display = document.getElementById('quick-result-display');
+  const label = document.getElementById('quick-result-label');
+  const sub = document.getElementById('quick-result-sub');
+  const vsWrap = document.getElementById('quick-vs-target');
+  const vsVal = document.getElementById('quick-vs-val');
+  const vsBar = document.getElementById('quick-vs-bar');
+
+  if (inp.value === '' || isNaN(val)) {
+    card.style.borderColor = 'var(--border2)';
+    display.textContent = '—';
+    display.style.color = 'var(--muted)';
+    label.textContent = 'Enter an amount above';
+    sub.textContent = '';
+    vsWrap.style.display = 'none';
+    return;
+  }
+
+  const isPos = val >= 0;
+  const col = isPos ? 'var(--green)' : 'var(--red)';
+
+  // Card border glow
+  card.style.borderColor = isPos ? 'rgba(46,204,138,0.5)' : 'rgba(224,85,85,0.5)';
+  card.style.background = isPos ? 'linear-gradient(135deg,var(--card),rgba(46,204,138,0.05))' : 'linear-gradient(135deg,var(--card),rgba(224,85,85,0.05))';
+
+  // Big display
+  display.textContent = (isPos ? '+' : '') + $fmt(val);
+  display.style.color = col;
+
+  // Label and sub
+  label.textContent = isPos ? '✅ Profitable day' : '❌ Losing day';
+  label.style.color = col;
+
+  // Sub message
+  const mo = parseInt(document.getElementById('month-select').value);
+  const m = MONTHS[mo-1];
+  const target = m.netTarget * m.accounts;
+  const diff = val - target;
+
+  if (isPos) {
+    if (val >= target) {
+      sub.textContent = '🎯 Target hit! ' + $fmt(diff) + ' above goal';
+      sub.style.color = 'var(--green)';
+    } else {
+      sub.textContent = $fmt(Math.abs(diff)) + ' below target — keep going';
+      sub.style.color = 'var(--gold2)';
+    }
+  } else {
+    sub.textContent = 'Max loss allowed: ' + $fmt(m.hardStop * m.accounts) + ' · Used: ' + $fmt(Math.abs(val));
+    sub.style.color = 'var(--red)';
+  }
+
+  // vs target bar
+  vsWrap.style.display = 'block';
+  if (isPos) {
+    const pct = Math.min(100, Math.round((val / target) * 100));
+    vsVal.textContent = pct + '% of target';
+    vsVal.style.color = pct >= 100 ? 'var(--green)' : 'var(--gold2)';
+    vsBar.style.width = pct + '%';
+    vsBar.style.background = pct >= 100 ? 'var(--green)' : 'linear-gradient(90deg,var(--gold),var(--green))';
+  } else {
+    const hardStop = m.hardStop * m.accounts;
+    const pct = Math.min(100, Math.round((Math.abs(val) / hardStop) * 100));
+    vsVal.textContent = pct + '% of hard stop';
+    vsVal.style.color = pct >= 80 ? 'var(--red)' : 'var(--gold2)';
+    vsBar.style.width = pct + '%';
+    vsBar.style.background = 'linear-gradient(90deg,var(--gold),var(--red))';
+  }
+
+  // Also sync to net summary row
+  document.getElementById('sum-net').textContent = $fmt(val);
+  document.getElementById('sum-net').style.color = col;
+}
+
+function recalcPnL() {
+  let gross = 0;
+  document.querySelectorAll('#tradeLogBody .pnl-field').forEach(inp => {
+    gross += parseFloat(inp.value) || 0;
+  });
+  const share = gross * 0.5;
+  const net = share * 0.72;
+  const mo = parseInt(document.getElementById('month-select').value);
+  const m = MONTHS[mo-1];
+  const target = m.netTarget * m.accounts;
+  const hardStop = m.hardStop * m.accounts;
+  const walkAway = m.walkAway * m.accounts;
+
+  document.getElementById('sum-gross').textContent = $fmt(gross);
+  document.getElementById('sum-gross').style.color = gross >= 0 ? '#fff' : 'var(--red)';
+  document.getElementById('sum-share').textContent = $fmt(share);
+  document.getElementById('sum-share').style.color = share >= 0 ? 'var(--gold2)' : 'var(--red)';
+  document.getElementById('sum-net').textContent = $fmt(net);
+  document.getElementById('sum-net').style.color = net >= 0 ? 'var(--green)' : 'var(--red)';
+
+  const statusEl = document.getElementById('sum-status');
+  const subEl = document.getElementById('sum-status-sub');
+  if (net >= target) { statusEl.textContent='🎯'; statusEl.style.color='var(--green)'; subEl.textContent='Target hit! Close platform.'; }
+  else if (share <= -hardStop) { statusEl.textContent='🛑'; statusEl.style.color='var(--red)'; subEl.textContent='Hard stop hit. Day over.'; }
+  else if (net >= walkAway && net > 0) { statusEl.textContent='✅'; statusEl.style.color='var(--green)'; subEl.textContent='Walk-away reached. Lock it in.'; }
+  else if (net > 0) { statusEl.textContent='📈'; statusEl.style.color='var(--green)'; subEl.textContent=$fmt(target-net)+' to target'; }
+  else if (gross === 0) { statusEl.textContent='—'; statusEl.style.color='var(--muted)'; subEl.textContent='no trades yet'; }
+  else { statusEl.textContent='📉'; statusEl.style.color='var(--red)'; subEl.textContent=$fmt(hardStop+net)+' to hard stop'; }
+}
+
+function selectEmo(btn, group) {
+  document.getElementById(group+'Emotion').querySelectorAll('.emo-btn').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+function saveDay() {
+  const date = document.getElementById('date-picker').value;
+  let gross = 0;
+  const trades = [];
+
+  // Collect from trade log rows
+  document.querySelectorAll('#tradeLogBody tr').forEach(tr => {
+    const inputs = tr.querySelectorAll('input, select');
+    if (inputs.length < 5) return;
+    const pnlVal = parseFloat(inputs[3].value);
+    if (isNaN(pnlVal) && !inputs[1].value) return; // skip blank rows
+    const pnl = isNaN(pnlVal) ? 0 : pnlVal;
+    gross += pnl;
+    trades.push({
+      time: inputs[0].value,
+      setup: inputs[1].value,
+      direction: inputs[2].value,
+      gross: pnl,
+      result: inputs[4].value,
+    });
+  });
+
+  // If quick-pnl was filled and no trade rows entered, use quick entry as net directly
+  const quickVal = parseFloat(document.getElementById('quick-pnl').value);
+  let share, net;
+  if (gross === 0 && !isNaN(quickVal) && quickVal !== 0) {
+    // Quick entry = net take-home typed directly
+    net = quickVal;
+    share = net / 0.72;       // reverse-calculate share
+    gross = share / 0.5;      // reverse-calculate gross
+  } else {
+    share = gross * 0.5;
+    net = share * 0.72;
+    // If quick-pnl is also filled, it overrides the net (user explicitly typed their actual take-home)
+    if (!isNaN(quickVal) && quickVal !== 0 && trades.length > 0) {
+      net = quickVal;
+    }
+  }
+
+  dayData[date] = {
+    gross, share, net,
+    quickNet: isNaN(quickVal) ? null : quickVal,
+    trades,
+    month: document.getElementById('month-select').value,
+    preChecked: document.querySelectorAll('#preChecklist .check-item.checked').length,
+    postChecked: document.querySelectorAll('#postChecklist .check-item.checked').length,
+    mentalScore: document.getElementById('mental-score').value,
+    execScore: document.getElementById('exec-score').value,
+    notes: document.getElementById('notes-what').value,
+    improve: document.getElementById('notes-improve').value,
+    preEmo: document.querySelector('#preEmotion .emo-btn.selected')?.textContent || '',
+    postEmo: document.querySelector('#postEmotion .emo-btn.selected')?.textContent || '',
+  };
+
+  save();
+  buildSetups();
+
+  // Always rebuild calendar so the saved day appears immediately
+  const savedYear = parseInt(date.slice(0,4));
+  const savedMonth = parseInt(date.slice(5,7)) - 1;
+  calYear = savedYear;
+  calMonth = savedMonth;
+  buildCalendar();
+
+  // Flash the save indicator with date confirmation
+  document.getElementById('saveInd').textContent = '✓ ' + date + ' saved — calendar updated';
+  showSaveInd();
+  setTimeout(() => { document.getElementById('saveInd').textContent = '✓ Saved'; }, 3000);
+}
+
+function loadDay(date) {
+  const d = dayData[date];
+  document.querySelectorAll('#preChecklist .check-item').forEach(el=>el.classList.remove('checked'));
+  document.querySelectorAll('#postChecklist .check-item').forEach(el=>el.classList.remove('checked'));
+  document.getElementById('pre-count').textContent='0/7';
+  document.getElementById('post-count').textContent='0/5';
+  document.getElementById('tradeLogBody').innerHTML='';
+  document.getElementById('notes-what').value='';
+  document.getElementById('notes-improve').value='';
+  document.getElementById('mental-score').value='';
+  document.getElementById('exec-score').value='';
+  document.querySelectorAll('.emo-btn').forEach(b=>b.classList.remove('selected'));
+
+  if (d) {
+    if (d.month) document.getElementById('month-select').value = d.month;
+    if (d.trades && d.trades.length > 0) {
+      d.trades.forEach(t => {
+        addTradeRow();
+        const rows = document.querySelectorAll('#tradeLogBody tr');
+        const last = rows[rows.length-1];
+        const inputs = last.querySelectorAll('input, select');
+        if (inputs[0]) inputs[0].value = t.time || '09:30';
+        if (inputs[1]) { inputs[1].value = t.setup || ''; }
+        if (inputs[2]) inputs[2].value = t.direction || 'LONG';
+        if (inputs[3]) {
+          inputs[3].value = t.gross !== undefined ? t.gross : '';
+          if (t.gross > 0) inputs[3].classList.add('pos');
+          if (t.gross < 0) inputs[3].classList.add('neg');
+        }
+        if (inputs[4]) inputs[4].value = t.result || 'WIN';
+      });
+    } else { addTradeRow(); addTradeRow(); }
+    document.getElementById('notes-what').value = d.notes || '';
+    document.getElementById('notes-improve').value = d.improve || '';
+    document.getElementById('mental-score').value = d.mentalScore || '';
+    document.getElementById('exec-score').value = d.execScore || '';
+    // Restore quick-pnl field
+    const qInp = document.getElementById('quick-pnl');
+    if (d.quickNet !== null && d.quickNet !== undefined) {
+      qInp.value = d.quickNet;
+      onQuickPnl(qInp);
+    } else if (d.net !== undefined && d.net !== 0) {
+      qInp.value = Math.round(d.net);
+      onQuickPnl(qInp);
+    } else {
+      qInp.value = '';
+      onQuickPnl(qInp);
+    }
+  } else {
+    addTradeRow(); addTradeRow();
+    document.getElementById('quick-pnl').value = '';
+    onQuickPnl(document.getElementById('quick-pnl'));
+  }
+  updateMonthSettings();
+  recalcPnL();
+}
+
+// ═══════════════════════════════════════════════
+// WEEKLY
+// ═══════════════════════════════════════════════
+function buildWeekly() {
+  const grid = document.getElementById('weekGrid');
+  grid.innerHTML = '';
+  const today = new Date();
+  const mon = new Date(today);
+  mon.setDate(today.getDate() - ((today.getDay()+6)%7));
+
+  let wkShare=0, wkNet=0, greenDays=0, worstDay=0;
+
+  DAYS.forEach((day,i) => {
+    const d = new Date(mon);
+    d.setDate(mon.getDate()+i);
+    const iso = d.toISOString().slice(0,10);
+    const data = dayData[iso];
+    const net = data ? (data.net||0) : null;
+    const share = data ? (data.share||0) : null;
+
+    if (share !== null) wkShare += share;
+    if (net !== null) { wkNet += net; if(net>0) greenDays++; if(net<worstDay) worstDay=net; }
+
+    const dotClass = net === null ? '' : net > 0 ? 'g' : 'r';
+    const card = document.createElement('div');
+    card.className = 'week-day-card';
+    card.onclick = () => {
+      document.getElementById('date-picker').value = iso;
+      updateDateDisp(iso);
+      loadDay(iso);
+      showPage('daily', document.querySelector('[onclick*="daily"]'));
+    };
+    card.innerHTML = `
+      <div class="wdc-hdr"><div class="wdc-day">${day}</div><div class="wdc-dot ${dotClass}"></div></div>
+      <div class="wdc-body">
+        <div class="wdc-stat"><div class="wdl">Date</div><div class="wdv" style="color:var(--muted)">${d.toLocaleDateString('en-US',{month:'short',day:'numeric'})}</div></div>
+        <div class="wdc-stat"><div class="wdl">Your Share</div><div class="wdv" style="color:var(--gold2)">${share!==null?$fmt(share):'—'}</div></div>
+        <div class="wdc-stat"><div class="wdl">Pre-check</div><div class="wdv" style="color:var(--muted)">${data?data.preChecked+'/7':'—'}</div></div>
+        <div class="wdc-pnl" style="color:${net===null?'var(--muted)':net>=0?'var(--green)':'var(--red)'}">${net!==null?$fmt(net):'No log'}</div>
+      </div>`;
+    grid.appendChild(card);
+  });
+
+  document.getElementById('wk-gross').textContent = $fmt(wkShare);
+  document.getElementById('wk-net').textContent = $fmt(wkNet);
+  document.getElementById('wk-net').style.color = wkNet>=0?'var(--green)':'var(--red)';
+  document.getElementById('wk-green').textContent = greenDays+'/5';
+  document.getElementById('wk-worst').textContent = $fmt(worstDay);
+  document.getElementById('week-label').textContent = 'Week of ' + mon.toLocaleDateString('en-US',{month:'long',day:'numeric'});
+}
+
+// ═══════════════════════════════════════════════
+// CALENDAR
+// ═══════════════════════════════════════════════
+function buildCalendar() {
+  const y = calYear, mo = calMonth;
+  document.getElementById('cal-title').textContent = MONTH_NAMES_LONG[mo] + ' ' + y;
+
+  const body = document.getElementById('calBody');
+  body.innerHTML = '';
+
+  const firstDow = new Date(y, mo, 1).getDay();
+  const daysInMonth = new Date(y, mo+1, 0).getDate();
+  const todayStr = new Date().toISOString().slice(0,10);
+
+  // empty leading cells
+  for (let i=0; i<firstDow; i++) {
+    const cell = document.createElement('div');
+    cell.className = 'cal-cell empty';
+    body.appendChild(cell);
+  }
+
+  let tradingDays=0, monthNet=0, monthShare=0, greenCount=0;
+
+  for (let d=1; d<=daysInMonth; d++) {
+    const dow = new Date(y, mo, d).getDay();
+    const iso = `${y}-${String(mo+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isWeekend = dow===0||dow===6;
+    const data = dayData[iso];
+    const net = data ? (data.net||0) : null;
+    const share = data ? (data.share||0) : null;
+    const isToday = iso === todayStr;
+
+    if (net !== null && !isWeekend) {
+      tradingDays++;
+      monthNet += net;
+      monthShare += share;
+      if (net > 0) greenCount++;
+    }
+
+    const cell = document.createElement('div');
+    let cls = 'cal-cell';
+    if (isWeekend) cls += ' weekend';
+    if (isToday) cls += ' today';
+    if (net !== null) cls += ' has-data ' + (net>=0?'pos':'neg');
+    cell.className = cls;
+
+    cell.innerHTML = `<div class="cal-day-num">${d}</div>`;
+    if (net !== null) {
+      cell.innerHTML += `<div class="cal-pnl-val ${net>=0?'pos':'neg'}">${$fmt(net)}</div>`;
+      cell.innerHTML += `<div class="cal-pnl-sub">${$fmt(share)} share</div>`;
+    } else if (!isWeekend) {
+      cell.innerHTML += `<div style="font-family:JetBrains Mono,monospace;font-size:9px;color:var(--muted2);margin-top:4px">no log</div>`;
+    }
+
+    if (!isWeekend) {
+      cell.style.cursor = 'pointer';
+      cell.onclick = () => {
+        document.getElementById('date-picker').value = iso;
+        updateDateDisp(iso);
+        loadDay(iso);
+        showPage('daily', document.querySelector('[onclick*="daily"]'));
+      };
+    }
+    body.appendChild(cell);
+  }
+
+  // trailing cells
+  const total = firstDow + daysInMonth;
+  const rem = total % 7;
+  if (rem !== 0) for (let i=rem; i<7; i++) { const c=document.createElement('div'); c.className='cal-cell empty'; body.appendChild(c); }
+
+  // summary
+  document.getElementById('cms-days').textContent = tradingDays;
+  document.getElementById('cms-gross').textContent = $fmt(monthShare);
+  document.getElementById('cms-gross').style.color = monthShare>=0?'var(--gold2)':'var(--red)';
+  document.getElementById('cms-net').textContent = $fmt(monthNet);
+  document.getElementById('cms-net').style.color = monthNet>=0?'var(--green)':'var(--red)';
+  document.getElementById('cms-wr').textContent = tradingDays > 0 ? Math.round((greenCount/tradingDays)*100)+'%' : '—';
+}
+
+function calPrev() { calMonth--; if(calMonth<0){calMonth=11;calYear--;} buildCalendar(); }
+function calNext() { calMonth++; if(calMonth>11){calMonth=0;calYear++;} buildCalendar(); }
+
+// ═══════════════════════════════════════════════
+// PROGRESS
+// ═══════════════════════════════════════════════
+function buildProgress() {
+  const days = Object.values(dayData);
+  if (days.length === 0) return;
+  const totalNet = days.reduce((a,d)=>a+(d.net||0),0);
+  const greenDays = days.filter(d=>(d.net||0)>0).length;
+  const wr = Math.round((greenDays/days.length)*100);
+  const nets = days.map(d=>d.net||0);
+  const best = Math.max(...nets);
+  const worst = Math.min(...nets);
+  const avg = totalNet / days.length;
+
+  document.getElementById('prog-total').textContent = $fmt(totalNet);
+  document.getElementById('prog-total').style.color = totalNet>=0?'var(--green)':'var(--red)';
+  document.getElementById('prog-days').textContent = days.length;
+  document.getElementById('prog-wr').textContent = wr+'%';
+  document.getElementById('prog-best').textContent = $fmt(best);
+  document.getElementById('prog-worst').textContent = $fmt(worst);
+  document.getElementById('prog-avg').textContent = $fmt(avg);
+  document.getElementById('prog-avg').style.color = avg>=0?'var(--green)':'var(--red)';
+
+  document.getElementById('inv-roth').textContent = $fmt(investments.roth);
+  document.getElementById('inv-index').textContent = $fmt(investments.index);
+  document.getElementById('inv-hysa').textContent = $fmt(investments.hysa);
+}
+
+function updateInv(key, val) {
+  investments[key] = parseFloat(val)||0;
+  save();
+}
+
+// ═══════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════
+load();
+loadTheme();
+buildRoadmap();
+buildRules();
+buildSetups();
+initDaily();
+calYear = 2026; calMonth = 3; // April 2026
+
+// ═══════════════════════════════════════════════
+// EXPORT / IMPORT
+// ═══════════════════════════════════════════════
+function exportData() {
+  const payload = { dayData, setups, investments, exportedAt: new Date().toISOString(), version: 2 };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const dateStr = new Date().toISOString().slice(0,10);
+  a.href = url;
+  a.download = 'trading-workbook-backup-' + dateStr + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  showSaveInd();
+}
+
+function importData(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const parsed = JSON.parse(e.target.result);
+      if (!parsed.dayData) { alert('Invalid backup file.'); return; }
+      const existing = Object.keys(dayData).length;
+      const incoming = Object.keys(parsed.dayData).length;
+      const msg = existing > 0
+        ? 'This will MERGE ' + incoming + ' sessions from backup with your ' + existing + ' existing sessions.\n\nExisting sessions with the same date will be overwritten by the backup.\n\nProceed?'
+        : 'Import ' + incoming + ' sessions from backup?';
+      if (!confirm(msg)) { input.value = ''; return; }
+      dayData = Object.assign({}, dayData, parsed.dayData);
+      if (parsed.setups) setups = parsed.setups;
+      if (parsed.investments) investments = parsed.investments;
+      save();
+      buildSetups();
+      buildProgress();
+      buildCalendar();
+      updateSidebar();
+      loadDay(document.getElementById('date-picker').value);
+      document.getElementById('saveInd').textContent = '✓ Import successful — ' + incoming + ' sessions loaded';
+      showSaveInd();
+      setTimeout(() => { document.getElementById('saveInd').textContent = '✓ Saved'; }, 3000);
+    } catch(err) {
+      alert('Could not read file. Make sure it is a valid workbook backup (.json).');
+    }
+    input.value = '';
+  };
+  reader.readAsText(file);
+}
+
+// ═══════════════════════════════════════════════
+// JOURNAL LIST
+// ═══════════════════════════════════════════════
+function buildJournal(filter) {
+  const entries = Object.entries(dayData)
+    .filter(([,d]) => d.notes || d.improve)
+    .sort((a,b) => b[0].localeCompare(a[0]));
+
+  document.getElementById('journal-count').textContent = entries.length + ' entries';
+
+  const filtered = filter
+    ? entries.filter(([date,d]) =>
+        (d.notes||'').toLowerCase().includes(filter.toLowerCase()) ||
+        (d.improve||'').toLowerCase().includes(filter.toLowerCase()) ||
+        date.includes(filter) ||
+        (d.preEmo||'').toLowerCase().includes(filter.toLowerCase()) ||
+        (d.postEmo||'').toLowerCase().includes(filter.toLowerCase())
+      )
+    : entries;
+
+  const list = document.getElementById('journalList');
+  if (filtered.length === 0) {
+    list.innerHTML = '<div class="journal-empty">No journal entries yet. Write notes in Today\'s Session and save the day.</div>';
+    return;
+  }
+
+  list.innerHTML = filtered.map(([date,d]) => {
+    const dt = new Date(date + 'T12:00:00');
+    const dayName = dt.toLocaleDateString('en-US',{weekday:'long'});
+    const dateDisp = dt.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+    const net = d.net || d.quickNet || 0;
+    const isPos = net >= 0;
+    const pnlStr = net !== 0 ? $fmt(net) : '—';
+    const tags = [];
+    if (d.preEmo) tags.push(d.preEmo);
+    if (d.postEmo) tags.push(d.postEmo);
+    if (d.mentalScore) tags.push('Mental: ' + d.mentalScore + '/10');
+    if (d.execScore) tags.push('Exec: ' + d.execScore + '/10');
+    if (d.preChecked) tags.push(d.preChecked + '/7 pre-checks');
+
+    return `<div class="journal-card" id="jc-${date}">
+      <div class="journal-card-hdr" onclick="toggleJournal('${date}')">
+        <div style="display:flex;align-items:center;gap:12px;flex:1">
+          <div>
+            <div class="journal-date">${date}</div>
+            <div class="journal-day-name">${dayName} · ${dateDisp}</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px">
+          ${net !== 0 ? `<div class="journal-pnl ${isPos?'pos':'neg'}">${pnlStr}</div>` : ''}
+          <div class="journal-expand">▼</div>
+        </div>
+      </div>
+      <div class="journal-body">
+        ${d.notes ? `<div class="journal-section"><div class="journal-section-label">What happened</div><div class="journal-text">${d.notes}</div></div>` : ''}
+        ${d.improve ? `<div class="journal-section"><div class="journal-section-label">One thing to improve</div><div class="journal-text">${d.improve}</div></div>` : ''}
+        ${tags.length > 0 ? `<div class="journal-tag-row">${tags.map(t=>'<span class="journal-tag">'+t+'</span>').join('')}</div>` : ''}
+        <div style="margin-top:12px">
+          <button onclick="goToDay('${date}')" style="background:var(--gold-bg);border:1px solid var(--gold);border-radius:5px;color:var(--gold2);font-family:JetBrains Mono,monospace;font-size:10px;padding:5px 12px;cursor:pointer;letter-spacing:0.08em">→ Open Session</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleJournal(date) {
+  const card = document.getElementById('jc-' + date);
+  card.classList.toggle('open');
+}
+
+function filterJournals(val) { buildJournal(val); }
+
+function goToDay(date) {
+  document.getElementById('date-picker').value = date;
+  updateDateDisp(date);
+  loadDay(date);
+  showPage('daily', null);
+}
+
+// ═══════════════════════════════════════════════
+// ANALYTICS
+// ═══════════════════════════════════════════════
+function buildAnalytics() {
+  const entries = Object.entries(dayData).sort((a,b) => a[0].localeCompare(b[0]));
+  const days = entries.map(([,d]) => d);
+  if (days.length === 0) {
+    document.getElementById('anGrid').innerHTML = '<div style="color:var(--muted);font-family:JetBrains Mono,monospace;font-size:12px;padding:20px;grid-column:1/-1">No data yet. Log some trading days first.</div>';
+    return;
+  }
+
+  const nets = days.map(d => d.net || 0);
+  const totalNet = nets.reduce((a,b) => a+b, 0);
+  const greenDays = nets.filter(n => n > 0).length;
+  const redDays = nets.filter(n => n < 0).length;
+  const beDays = nets.filter(n => n === 0).length;
+  const wr = Math.round((greenDays / days.length) * 100);
+  const best = Math.max(...nets);
+  const worst = Math.min(...nets);
+  const avg = totalNet / days.length;
+  const posNets = nets.filter(n=>n>0);
+  const negNets = nets.filter(n=>n<0);
+  const avgWin = posNets.length ? posNets.reduce((a,b)=>a+b,0)/posNets.length : 0;
+  const avgLoss = negNets.length ? Math.abs(negNets.reduce((a,b)=>a+b,0)/negNets.length) : 0;
+  const profitFactor = avgLoss > 0 ? (avgWin / avgLoss).toFixed(2) : '∞';
+  const totalTrades = days.reduce((a,d)=>(a + (d.trades||[]).length),0);
+  const allShares = days.map(d=>d.share||0);
+  const totalShare = allShares.reduce((a,b)=>a+b,0);
+
+  // Streak
+  let curStreak = 0, maxStreak = 0, tempStreak = 0;
+  nets.forEach(n => { if(n>0){tempStreak++;if(tempStreak>maxStreak)maxStreak=tempStreak;}else tempStreak=0; });
+  tempStreak = 0;
+  [...nets].reverse().forEach((n,i) => { if(i===0&&n>0)curStreak++;else if(curStreak>0&&n>0)curStreak++;});
+
+  // Dates range
+  if (entries.length > 0) {
+    document.getElementById('an-date-range').textContent = entries[0][0] + ' → ' + entries[entries.length-1][0];
+  }
+
+  // Key metrics
+  const metrics = [
+    {label:'Win Rate',val:wr+'%',sub:greenDays+'W · '+redDays+'L · '+beDays+'BE',color:wr>=60?'var(--green)':wr>=40?'var(--gold2)':'var(--red)'},
+    {label:'Total Net',val:$fmt(totalNet),sub:'after tax & split',color:totalNet>=0?'var(--green)':'var(--red)'},
+    {label:'Avg Day Net',val:$fmt(avg),sub:'per session',color:avg>=0?'var(--green)':'var(--red)'},
+    {label:'Best Day',val:$fmt(best),sub:'single session',color:'var(--green)'},
+    {label:'Worst Day',val:$fmt(worst),sub:'single session',color:'var(--red)'},
+    {label:'Profit Factor',val:profitFactor,sub:'avg win / avg loss',color:'var(--blue)'},
+    {label:'Avg Win Day',val:$fmt(avgWin),sub:'when positive',color:'var(--green)'},
+    {label:'Avg Loss Day',val:$fmt(avgLoss),sub:'when negative',color:'var(--red)'},
+    {label:'Total Trades',val:totalTrades,sub:'all sessions',color:'var(--text)'},
+    {label:'Total Sessions',val:days.length,sub:'days logged',color:'var(--gold2)'},
+    {label:'Best Streak',val:maxStreak+' days',sub:'consecutive green',color:'var(--green)'},
+    {label:'Total Gross (50%)',val:$fmt(totalShare),sub:'your prop share',color:'var(--gold2)'},
+  ];
+  document.getElementById('anGrid').innerHTML = metrics.map(m =>
+    `<div class="an-card"><div class="an-label">${m.label}</div><div class="an-val" style="color:${m.color}">${m.val}</div><div class="an-sub">${m.sub}</div></div>`
+  ).join('');
+
+  // Distribution
+  const total = days.length;
+  document.getElementById('anDist').innerHTML = [
+    {label:'Green Days',count:greenDays,color:'var(--green)'},
+    {label:'Red Days',count:redDays,color:'var(--red)'},
+    {label:'Breakeven',count:beDays,color:'var(--muted)'},
+  ].map(r => {
+    const pct = total > 0 ? Math.round((r.count/total)*100) : 0;
+    return `<div class="dist-row"><div class="dist-label">${r.label}</div><div class="dist-bar-bg"><div class="dist-bar-fill" style="width:${pct}%;background:${r.color}"></div></div><div class="dist-val">${r.count}</div></div>`;
+  }).join('');
+
+  // Day of week
+  const dowMap = {1:[],2:[],3:[],4:[],5:[]};
+  entries.forEach(([date,d]) => {
+    const dow = new Date(date+'T12:00:00').getDay();
+    if (dowMap[dow]) dowMap[dow].push(d.net||0);
+  });
+  const dowNames = {1:'Monday',2:'Tuesday',3:'Wednesday',4:'Thursday',5:'Friday'};
+  const dowAvgs = Object.entries(dowMap).map(([dow,nets]) => ({
+    dow: dowNames[dow], avg: nets.length ? nets.reduce((a,b)=>a+b,0)/nets.length : 0, count: nets.length
+  }));
+  const maxAbs = Math.max(...dowAvgs.map(d=>Math.abs(d.avg)), 1);
+  document.getElementById('anDow').innerHTML = dowAvgs.map(d => {
+    const pct = Math.round((Math.abs(d.avg)/maxAbs)*100);
+    const col = d.avg >= 0 ? 'var(--green)' : 'var(--red)';
+    return `<div class="dist-row"><div class="dist-label">${d.dow.slice(0,3)}</div><div class="dist-bar-bg"><div class="dist-bar-fill" style="width:${pct}%;background:${col}"></div></div><div class="dist-val" style="color:${col}">${d.count>0?$fmt(d.avg):'—'}</div></div>`;
+  }).join('');
+
+  // 30-day streak dots
+  const last30 = [];
+  for (let i=29; i>=0; i--) {
+    const d2 = new Date(); d2.setDate(d2.getDate()-i);
+    const iso = d2.toISOString().slice(0,10);
+    const dow = d2.getDay();
+    if (dow===0||dow===6) continue;
+    const data = dayData[iso];
+    const net2 = data ? (data.net||0) : null;
+    last30.push({iso, net:net2});
+  }
+  document.getElementById('anStreak').innerHTML = last30.map(s => {
+    const cls = s.net === null ? 'n' : s.net > 0 ? 'g' : 'r';
+    const tip = s.iso + (s.net !== null ? ': ' + $fmt(s.net) : ': no log');
+    return `<div class="streak-dot ${cls}" data-tip="${tip}" title="${tip}"></div>`;
+  }).join('');
+
+  // All sessions table
+  const tableRows = [...entries].reverse().map(([date,d]) => {
+    const dt = new Date(date+'T12:00:00');
+    const dayName = dt.toLocaleDateString('en-US',{weekday:'short'});
+    const net2 = d.net||0;
+    const tradeCount = (d.trades||[]).length;
+    return `<tr>
+      <td style="font-family:JetBrains Mono,monospace;font-size:10px;color:var(--muted)">${date}</td>
+      <td style="font-family:JetBrains Mono,monospace;font-size:10px;color:var(--muted)">${dayName}</td>
+      <td style="font-family:JetBrains Mono,monospace;font-size:12px;font-weight:700;color:${net2>=0?'var(--green)':'var(--red)'}">${$fmt(net2)}</td>
+      <td style="font-family:JetBrains Mono,monospace;font-size:11px;color:var(--gold2)">${$fmt(d.share||0)}</td>
+      <td style="font-family:JetBrains Mono,monospace;font-size:11px;color:var(--muted)">${$fmt(d.gross||0)}</td>
+      <td style="font-family:JetBrains Mono,monospace;font-size:11px;color:var(--muted);text-align:center">${tradeCount||'—'}</td>
+      <td style="font-family:JetBrains Mono,monospace;font-size:11px;color:var(--muted);text-align:center">${d.mentalScore||'—'}</td>
+      <td style="font-family:JetBrains Mono,monospace;font-size:11px;color:var(--muted);text-align:center">${d.execScore||'—'}</td>
+      <td style="font-family:JetBrains Mono,monospace;font-size:11px;color:var(--muted);text-align:center">${d.preChecked||0}/7</td>
+    </tr>`;
+  }).join('');
+  document.getElementById('anTable').innerHTML = tableRows || '<tr><td colspan="9" style="padding:12px;color:var(--muted);font-family:JetBrains Mono,monospace;font-size:11px">No sessions logged</td></tr>';
+}
+
+// ═══════════════════════════════════════════════
+// THEMES
+// ═══════════════════════════════════════════════
+const THEMES = [
+  {id:'dark',name:'Midnight',colors:['#0a0d13','#e8c96d','#2ecc8a','#e05555','#4a9eff']},
+  {id:'light',name:'Daylight',colors:['#f5f4f0','#9a6e00','#1a7a4a','#c0392b','#1a5276']},
+  {id:'forest',name:'Forest',colors:['#0d1a0f','#c4e86d','#4ecc6a','#e05555','#4acca8']},
+  {id:'midnight',name:'Ocean',colors:['#050a18','#ffd56d','#4acca8','#e05577','#7ab4ff']},
+  {id:'rose',name:'Rose Gold',colors:['#1a1015','#ffc090','#cc8aaa','#e05555','#c088e8']},
+];
+
+let currentTheme = 'dark';
+let isLight = false;
+let currentFont = 'default';
+
+function buildThemes() {
+  const grid = document.getElementById('themeGrid');
+  grid.innerHTML = THEMES.map(t => `
+    <div class="theme-swatch ${t.id===currentTheme?'active':''}" id="sw-${t.id}" onclick="setTheme('${t.id}',this)">
+      <div class="sw-preview">${t.colors.map(c=>`<div class="sw-dot" style="background:${c}"></div>`).join('')}</div>
+      <div class="sw-name">${t.name}</div>
+    </div>`).join('');
+}
+
+function setTheme(id, el) {
+  // Remove all theme classes
+  THEMES.forEach(t => document.body.classList.remove('theme-'+t.id));
+  currentTheme = id;
+  if (id !== 'dark') document.body.classList.add('theme-'+id);
+  // Sync light toggle safely (element may not exist yet)
+  isLight = (id === 'light');
+  const ltEl = document.getElementById('light-toggle');
+  if (ltEl) ltEl.checked = isLight;
+  const dlEl = document.getElementById('dl-label-text');
+  if (dlEl) dlEl.textContent = 'Currently: ' + (isLight ? 'Light Mode' : 'Dark Mode');
+  // Update swatch active states
+  document.querySelectorAll('.theme-swatch').forEach(s => s.classList.remove('active'));
+  if (el) {
+    el.classList.add('active');
+  } else {
+    const sw = document.getElementById('sw-'+id);
+    if (sw) sw.classList.add('active');
+  }
+  try { localStorage.setItem('twb_theme', id); } catch(e) {}
+}
+
+function toggleLight(checkbox) {
+  if (checkbox.checked) {
+    setTheme('light', null);
+    document.getElementById('dl-label-text').textContent = 'Currently: Light Mode';
+  } else {
+    setTheme('dark', null);
+    document.getElementById('dl-label-text').textContent = 'Currently: Dark Mode';
+  }
+  // Rebuild theme grid to reflect active state
+  if (document.getElementById('themeGrid').innerHTML !== '') buildThemes();
+}
+
+function setFont(id, el) {
+  document.body.style.fontFamily = id==='mono' ? "'JetBrains Mono',monospace" : id==='sans' ? "'DM Sans',sans-serif" : "'DM Sans',sans-serif";
+  currentFont = id;
+  document.querySelectorAll('[id^="font-"]').forEach(s=>s.classList.remove('active'));
+  if(el) el.classList.add('active');
+  try { localStorage.setItem('twb_font', id); } catch(e) {}
+}
+
+function loadTheme() {
+  try {
+    const t = localStorage.getItem('twb_theme');
+    if (t) { currentTheme = t; setTheme(t, null); }
+    const f = localStorage.getItem('twb_font');
+    if (f) { setFont(f, document.getElementById('font-'+f)); }
+  } catch(e) {}
+}
+
+// ═══════════════════════════════════════════════
+// UPDATE showPage to handle new pages
+// ═══════════════════════════════════════════════
+// showPage already defined above — extended inline
+</script>
+</body>
+</html>
