@@ -16,6 +16,21 @@ body.theme-midnight{--bg:#050a18;--surface:#080f24;--card:#0d1630;--card2:#101c3
 /* ROSE GOLD THEME */
 body.theme-rose{--bg:#1a1015;--surface:#201318;--card:#281820;--card2:#301c26;--border:#3d2030;--border2:#4a2838;--gold:#e8a06d;--gold2:#ffc090;--gold-bg:rgba(232,160,109,0.08);--green:#cc8aaa;--green-bg:rgba(204,138,170,0.08);--red:#e05555;--red-bg:rgba(224,85,85,0.08);--blue:#c088e8;--blue-bg:rgba(192,136,232,0.08);--text:#f5d8e8;--muted:#8a5870;--muted2:#5a3850;}
 
+/* PASSWORD SCREEN */
+#pw-screen{position:fixed;inset:0;background:#0a0d13;z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;}
+#pw-screen.hidden{display:none;}
+.pw-box{background:#0f1520;border:1px solid #243650;border-radius:16px;padding:48px 40px;text-align:center;width:340px;max-width:90vw;}
+.pw-logo{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:700;color:#e8c96d;margin-bottom:6px;}
+.pw-sub{font-family:'JetBrains Mono',monospace;font-size:10px;color:#5a7a99;letter-spacing:0.2em;text-transform:uppercase;margin-bottom:32px;}
+.pw-input{width:100%;background:#0a0d13;border:2px solid #243650;border-radius:8px;color:#dce8f5;font-family:'JetBrains Mono',monospace;font-size:18px;padding:12px 16px;outline:none;text-align:center;letter-spacing:0.2em;transition:border-color 0.2s;margin-bottom:12px;}
+.pw-input:focus{border-color:#e8c96d;}
+.pw-input.error{border-color:#e05555;animation:shake 0.3s ease;}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.pw-btn{width:100%;padding:12px;background:rgba(201,168,76,0.1);border:1px solid #c9a84c;border-radius:8px;color:#e8c96d;font-family:'JetBrains Mono',monospace;font-size:13px;letter-spacing:0.12em;cursor:pointer;transition:background 0.2s;margin-bottom:10px;}
+.pw-btn:hover{background:rgba(201,168,76,0.2);}
+.pw-error{font-family:'JetBrains Mono',monospace;font-size:11px;color:#e05555;height:16px;margin-top:4px;}
+.pw-hint{font-family:'JetBrains Mono',monospace;font-size:9px;color:#3d5570;margin-top:16px;letter-spacing:0.1em;}
+
 /* THEME SWITCHER UI */
 .theme-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:32px;}
 .theme-swatch{background:var(--card);border:2px solid var(--border);border-radius:10px;padding:14px 10px;text-align:center;cursor:pointer;transition:all 0.2s;}
@@ -291,6 +306,27 @@ input[type=number]{-moz-appearance:textfield;}::-webkit-scrollbar-track{backgrou
 </style>
 </head>
 <body>
+<!-- PASSWORD SCREEN -->
+<div id="pw-screen">
+  <div class="pw-box">
+    <div class="pw-logo">🔒</div>
+    <div class="pw-logo" style="font-size:28px;margin-top:4px">Trader's Workbook</div>
+    <div class="pw-sub">NQ / MNQ · Topstep</div>
+    <input
+      type="password"
+      id="pw-input"
+      class="pw-input"
+      placeholder="••••••••"
+      maxlength="30"
+      onkeydown="if(event.key==='Enter')checkPassword()"
+      autocomplete="current-password"
+    >
+    <button class="pw-btn" onclick="checkPassword()">ENTER WORKBOOK</button>
+    <div class="pw-error" id="pw-error"></div>
+    <div class="pw-hint">Enter your password to access your trading data</div>
+  </div>
+</div>
+
 <div class="app">
 
 <!-- SIDEBAR -->
@@ -674,6 +710,16 @@ input[type=number]{-moz-appearance:textfield;}::-webkit-scrollbar-track{backgrou
       <span style="background:var(--gold-bg);border:1px solid var(--gold);border-radius:6px;padding:6px 14px;font-family:JetBrains Mono,monospace;font-size:11px;color:var(--gold2)">$300 Target</span>
     </div>
   </div>
+  <div style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--muted);margin-bottom:14px;display:flex;align-items:center;gap:10px;margin-top:24px">Save Theme<span style="flex:1;height:1px;background:var(--border)"></span></div>
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px 28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px">
+    <div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text);margin-bottom:4px">Current selection: <span id="theme-current-label" style="color:var(--gold2);font-weight:700">Midnight (Dark)</span></div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted)">Saved theme loads automatically every time you open the workbook</div>
+    </div>
+    <button id="save-theme-btn" onclick="saveTheme()" style="background:var(--gold-bg);border:2px solid var(--gold);border-radius:8px;color:var(--gold2);font-family:'JetBrains Mono',monospace;font-size:12px;padding:12px 28px;cursor:pointer;letter-spacing:0.1em;transition:all 0.2s;white-space:nowrap">&#x1F4BE; SAVE THEME</button>
+  </div>
+  <div id="theme-saved-msg" style="display:none;margin-top:10px;background:var(--green-bg);border:1px solid var(--green);border-radius:8px;padding:12px 20px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--green);text-align:center">&#x2713; Theme saved &#x2014; will load automatically next time you open the workbook</div>
+
 </div>
 
 </div><!-- end main -->
@@ -1405,8 +1451,41 @@ function updateInv(key, val) {
 // ═══════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════
+// PASSWORD PROTECTION
+// ═══════════════════════════════════════════════
+// ⚠️  CHANGE THIS TO YOUR OWN PASSWORD BEFORE UPLOADING TO GITHUB
+const WORKBOOK_PASSWORD = 'trade2026';
+
+function checkPassword() {
+  const inp = document.getElementById('pw-input');
+  const val = inp.value;
+  if (val === WORKBOOK_PASSWORD) {
+    document.getElementById('pw-screen').classList.add('hidden');
+    try { sessionStorage.setItem('twb_auth','1'); } catch(e) {}
+  } else {
+    inp.classList.add('error');
+    document.getElementById('pw-error').textContent = 'Incorrect password. Try again.';
+    inp.value = '';
+    setTimeout(() => { inp.classList.remove('error'); }, 400);
+    inp.focus();
+  }
+}
+
+function initPasswordScreen() {
+  // Stay unlocked for the current browser session
+  try {
+    if (sessionStorage.getItem('twb_auth') === '1') {
+      document.getElementById('pw-screen').classList.add('hidden');
+      return;
+    }
+  } catch(e) {}
+  document.getElementById('pw-input').focus();
+}
+
 load();
 loadTheme();
+initPasswordScreen();
 buildRoadmap();
 buildRules();
 buildSetups();
@@ -1689,6 +1768,7 @@ function buildThemes() {
       <div class="sw-preview">${t.colors.map(c=>`<div class="sw-dot" style="background:${c}"></div>`).join('')}</div>
       <div class="sw-name">${t.name}</div>
     </div>`).join('');
+  updateThemeLabel();
 }
 
 function setTheme(id, el) {
@@ -1711,6 +1791,42 @@ function setTheme(id, el) {
     if (sw) sw.classList.add('active');
   }
   try { localStorage.setItem('twb_theme', id); } catch(e) {}
+  // Update the label in the save row
+  updateThemeLabel();
+}
+
+function updateThemeLabel() {
+  const el = document.getElementById('theme-current-label');
+  if (!el) return;
+  const names = {dark:'Midnight (Dark)',light:'Daylight (Light)',forest:'Forest',midnight:'Ocean (Blue)',rose:'Rose Gold'};
+  const lightState = isLight ? ' · Light Mode' : '';
+  el.textContent = (names[currentTheme] || currentTheme) + lightState;
+}
+
+function saveTheme() {
+  try {
+    localStorage.setItem('twb_theme', currentTheme);
+    localStorage.setItem('twb_font', currentFont);
+  } catch(e) {}
+  // Flash the button
+  const btn = document.getElementById('save-theme-btn');
+  const msg = document.getElementById('theme-saved-msg');
+  if (btn) {
+    btn.textContent = '✓ SAVED';
+    btn.style.background = 'var(--green-bg)';
+    btn.style.borderColor = 'var(--green)';
+    btn.style.color = 'var(--green)';
+    setTimeout(() => {
+      btn.textContent = '💾 SAVE THEME';
+      btn.style.background = 'var(--gold-bg)';
+      btn.style.borderColor = 'var(--gold)';
+      btn.style.color = 'var(--gold2)';
+    }, 2000);
+  }
+  if (msg) {
+    msg.style.display = 'block';
+    setTimeout(() => { msg.style.display = 'none'; }, 3000);
+  }
 }
 
 function toggleLight(checkbox) {
